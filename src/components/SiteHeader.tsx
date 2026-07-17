@@ -58,9 +58,15 @@ export function SiteHeader() {
         </Link>
 
         <div className="flex items-center gap-2">
+          {isAdmin && (
+            <Button asChild size="sm" variant="outline" className="hidden sm:inline-flex border-primary/40 text-primary hover:bg-primary/10">
+              <Link to="/admin"><Shield className="mr-1.5 h-4 w-4" />Admin Dashboard</Link>
+            </Button>
+          )}
           <Button variant="ghost" size="icon" onClick={toggleDark} aria-label="Toggle theme">
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
+
 
           {user ? (
             <DropdownMenu>
