@@ -1,0 +1,12 @@
+{
+  "name": "HireSetu — Jobs",
+  "short_name": "HireSetu",
+  "description": "Discover, share and apply to jobs across India.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2b64f0",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "any", "type": "image/x-icon" }
+  ]
+}
