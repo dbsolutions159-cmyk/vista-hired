@@ -119,7 +119,7 @@
 @utility gradient-hero {
   background-image: var(--gradient-hero);
 }
-.dark @utility gradient-hero-dark {
+@utility gradient-hero-dark {
   background-image: var(--gradient-hero-dark);
 }
 @utility glass {
