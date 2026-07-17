@@ -47,27 +47,7 @@ export const submitApplication = createServerFn({ method: "POST" })
       throw new Error(insErr.message);
     }
 
-    // Try to send confirmation emails, but never fail the application if email isn't set up.
-    let emailStatus: "sent" | "skipped" | "failed" = "skipped";
-    try {
-      const mod = await import("@lovable.dev/email-js").catch(() => null);
-      if (mod && typeof (mod as any).sendLovableEmail === "function") {
-        const apiKey = process.env.LOVABLE_API_KEY;
-        if (apiKey) {
-          const html = `<p>Hi ${data.full_name},</p><p>Thank you for applying to <strong>${job.title}</strong> at <strong>${job.company_name}</strong>. Your application has been received successfully. We will be in touch if there's a match.</p><p>— The HireSetu Team</p>`;
-          await (mod as any).sendLovableEmail({
-            apiKey,
-            to: data.email,
-            subject: `Application received: ${job.title} at ${job.company_name}`,
-            html,
-          });
-          emailStatus = "sent";
-        }
-      }
-    } catch (e) {
-      console.warn("Confirmation email skipped:", e);
-      emailStatus = "failed";
-    }
-
-    return { ok: true, emailStatus };
+    // Email confirmations require an email domain (Cloud → Emails). When configured,
+    // wire up sendLovableEmail here; until then the application is saved without email.
+    return { ok: true };
   });
