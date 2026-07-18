@@ -121,7 +121,7 @@ function AdminApplications() {
             <tbody className="divide-y">
               {filtered.map((a: any) => (
                 <tr key={a.id} className="hover:bg-muted/30">
-                  <td className="px-4 py-3"><div className="font-medium">{a.full_name}</div><div className="text-xs text-muted-foreground">{a.city}</div></td>
+                  <td className="px-4 py-3"><Link to="/admin/applications/$id" params={{ id: a.id }} className="font-medium hover:underline text-primary">{a.full_name}</Link><div className="text-xs text-muted-foreground">{a.city}</div></td>
                   <td className="px-4 py-3"><div className="font-medium">{a.jobs?.title}</div><div className="text-xs text-muted-foreground">{a.jobs?.company_name}</div></td>
                   <td className="px-4 py-3"><div>{a.email}</div><div className="text-xs text-muted-foreground">{a.mobile}</div></td>
                   <td className="px-4 py-3">{a.experience}</td>
