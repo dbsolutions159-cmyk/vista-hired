@@ -233,6 +233,33 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_external_jobs: {
+        Row: {
+          created_at: string
+          external_id: string
+          id: string
+          payload: Json
+          source: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          external_id: string
+          id?: string
+          payload: Json
+          source: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          external_id?: string
+          id?: string
+          payload?: Json
+          source?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       saved_jobs: {
         Row: {
           created_at: string
