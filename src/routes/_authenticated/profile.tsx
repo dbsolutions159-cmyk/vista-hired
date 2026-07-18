@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatSalary, timeAgo } from "@/lib/jobs";
+import { timeAgo } from "@/lib/jobs";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -29,13 +29,18 @@ function ProfilePage() {
 
   const saved = useQuery({
     enabled: !!user,
-    queryKey: ["saved-jobs", user?.id],
+    queryKey: ["saved-external-jobs", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("saved_jobs").select("*, jobs(*)").eq("user_id", user!.id).order("created_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("saved_external_jobs")
+        .select("*")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
   });
+
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -68,18 +73,24 @@ function ProfilePage() {
         <TabsContent value="saved" className="mt-4 space-y-3">
           {saved.isLoading && <Skeleton className="h-24 w-full" />}
           {saved.data?.length === 0 && <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">Nothing saved yet.</p>}
-          {saved.data?.map((s: any) => (
-            <Card key={s.id} className="p-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="min-w-0">
-                  <Link to="/jobs/$id" params={{ id: s.job_id }} className="font-semibold hover:text-primary">{s.jobs?.title}</Link>
-                  <div className="text-sm text-muted-foreground truncate">{s.jobs?.company_name} · {s.jobs?.location}</div>
-                  <div className="text-xs text-muted-foreground mt-1">{formatSalary(s.jobs)}</div>
+          {saved.data?.map((s: any) => {
+            const p = s.payload || {};
+            return (
+              <Card key={s.id} className="p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="font-semibold truncate">{p.title}</div>
+                    <div className="text-sm text-muted-foreground truncate">{p.company} · {p.location}</div>
+                    <div className="text-xs text-muted-foreground mt-1">{p.salary || "Salary not disclosed"} · {s.source}</div>
+                  </div>
+                  <Button asChild variant="outline" size="sm">
+                    <a href={p.url} target="_blank" rel="noopener noreferrer"><ExternalLink className="mr-1.5 h-3.5 w-3.5" />Apply</a>
+                  </Button>
                 </div>
-                <Button asChild variant="outline" size="sm"><Link to="/apply/$id" params={{ id: s.job_id }}><ExternalLink className="mr-1.5 h-3.5 w-3.5" />Apply</Link></Button>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
+
         </TabsContent>
       </Tabs>
     </div>
