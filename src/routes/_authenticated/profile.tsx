@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatSalary, timeAgo } from "@/lib/jobs";
+import { timeAgo } from "@/lib/jobs";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
