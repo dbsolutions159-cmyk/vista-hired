@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Building2, MapPin, Briefcase, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +23,11 @@ function JobDetail() {
       return data;
     },
   });
+
+  useEffect(() => {
+    if (id) supabase.rpc("increment_job_view", { _job_id: id });
+  }, [id]);
+
 
   if (isLoading) {
     return <div className="mx-auto max-w-3xl p-6 space-y-4"><Skeleton className="h-40 w-full" /><Skeleton className="h-6 w-2/3" /><Skeleton className="h-40 w-full" /></div>;

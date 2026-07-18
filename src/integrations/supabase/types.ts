@@ -126,6 +126,7 @@ export type Database = {
           salary_min: number | null
           title: string
           updated_at: string
+          view_count: number
           work_type: Database["public"]["Enums"]["work_type"]
         }
         Insert: {
@@ -145,6 +146,7 @@ export type Database = {
           salary_min?: number | null
           title: string
           updated_at?: string
+          view_count?: number
           work_type?: Database["public"]["Enums"]["work_type"]
         }
         Update: {
@@ -164,6 +166,7 @@ export type Database = {
           salary_min?: number | null
           title?: string
           updated_at?: string
+          view_count?: number
           work_type?: Database["public"]["Enums"]["work_type"]
         }
         Relationships: []
@@ -322,6 +325,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_job_view: { Args: { _job_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"

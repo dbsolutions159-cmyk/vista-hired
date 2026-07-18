@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pause, Pencil, Play, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -166,7 +166,10 @@ function AdminJobs() {
                 <div className="text-xs text-muted-foreground truncate">{j.company_name} · {j.location} · {workTypeLabels[j.work_type]}</div>
               </div>
               <div className="flex items-center gap-1">
-                <Badge variant={j.published ? "default" : "secondary"} className="cursor-pointer" onClick={() => togglePub(j)}>{j.published ? "Live" : "Draft"}</Badge>
+                <Badge variant={j.published ? "default" : "secondary"}>{j.published ? "Live" : "Paused"}</Badge>
+                <Button variant="ghost" size="icon" title={j.published ? "Pause" : "Activate"} onClick={() => togglePub(j)}>
+                  {j.published ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 text-emerald-600" />}
+                </Button>
                 <Button variant="ghost" size="icon" onClick={() => startEdit(j)}><Pencil className="h-4 w-4" /></Button>
                 <Button variant="ghost" size="icon" onClick={() => { if (confirm("Delete this job?")) del.mutate(j.id); }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
               </div>
