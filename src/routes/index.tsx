@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalJobCard } from "@/components/ExternalJobCard";
+import { LocationPicker } from "@/components/LocationPicker";
 import { fetchExternalJobs, type ExternalJob } from "@/lib/external-jobs.functions";
 
 export const Route = createFileRoute("/")({
@@ -89,7 +90,7 @@ function HomePage() {
                   <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Title, company, or skill (e.g. React, Marketing)" className="h-11 pl-9 bg-background/70" />
                 </div>
-                <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location (city or country)" className="h-11 md:w-56 bg-background/70" />
+                <LocationPicker value={location} onChange={setLocation} />
                 <Button type="submit" className="h-11 gradient-primary text-primary-foreground shadow-soft">Search</Button>
               </div>
               <div className="mt-3 flex flex-wrap gap-1.5 px-1">
