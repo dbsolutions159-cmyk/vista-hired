@@ -205,33 +205,78 @@ export type Database = {
           avatar_url: string | null
           city: string | null
           created_at: string
+          current_company: string | null
+          date_of_birth: string | null
+          education: string | null
           email: string | null
+          employment_pref: string | null
+          expected_salary: string | null
+          experience_summary: string | null
+          experience_years: string | null
           full_name: string | null
+          gender: string | null
           headline: string | null
           id: string
+          languages: string[] | null
+          linkedin_url: string | null
           phone: string | null
+          portfolio_url: string | null
+          preferred_location: string | null
+          resume_name: string | null
+          resume_path: string | null
+          skills: string[] | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           city?: string | null
           created_at?: string
+          current_company?: string | null
+          date_of_birth?: string | null
+          education?: string | null
           email?: string | null
+          employment_pref?: string | null
+          expected_salary?: string | null
+          experience_summary?: string | null
+          experience_years?: string | null
           full_name?: string | null
+          gender?: string | null
           headline?: string | null
           id: string
+          languages?: string[] | null
+          linkedin_url?: string | null
           phone?: string | null
+          portfolio_url?: string | null
+          preferred_location?: string | null
+          resume_name?: string | null
+          resume_path?: string | null
+          skills?: string[] | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           city?: string | null
           created_at?: string
+          current_company?: string | null
+          date_of_birth?: string | null
+          education?: string | null
           email?: string | null
+          employment_pref?: string | null
+          expected_salary?: string | null
+          experience_summary?: string | null
+          experience_years?: string | null
           full_name?: string | null
+          gender?: string | null
           headline?: string | null
           id?: string
+          languages?: string[] | null
+          linkedin_url?: string | null
           phone?: string | null
+          portfolio_url?: string | null
+          preferred_location?: string | null
+          resume_name?: string | null
+          resume_path?: string | null
+          skills?: string[] | null
           updated_at?: string
         }
         Relationships: []
