@@ -17,6 +17,7 @@ import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedProfileEditRouteImport } from './routes/_authenticated/profile.edit'
 import { Route as AuthenticatedApplyIdRouteImport } from './routes/_authenticated/apply.$id'
 import { Route as AuthenticatedAdminJobsRouteImport } from './routes/_authenticated/admin.jobs'
 import { Route as AuthenticatedAdminApplicationsRouteImport } from './routes/_authenticated/admin.applications'
@@ -61,6 +62,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedProfileEditRoute =
+  AuthenticatedProfileEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
 const AuthenticatedApplyIdRoute = AuthenticatedApplyIdRouteImport.update({
   id: '/apply/$id',
   path: '/apply/$id',
@@ -89,11 +96,12 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
-  '/profile': typeof AuthenticatedProfileRoute
+  '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/jobs/$id': typeof JobsIdRoute
   '/admin/applications': typeof AuthenticatedAdminApplicationsRouteWithChildren
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
   '/apply/$id': typeof AuthenticatedApplyIdRoute
+  '/profile/edit': typeof AuthenticatedProfileEditRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/applications/$id': typeof AuthenticatedAdminApplicationsIdRoute
 }
@@ -101,11 +109,12 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/profile': typeof AuthenticatedProfileRoute
+  '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/jobs/$id': typeof JobsIdRoute
   '/admin/applications': typeof AuthenticatedAdminApplicationsRouteWithChildren
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
   '/apply/$id': typeof AuthenticatedApplyIdRoute
+  '/profile/edit': typeof AuthenticatedProfileEditRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/applications/$id': typeof AuthenticatedAdminApplicationsIdRoute
 }
@@ -116,11 +125,12 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
-  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRouteWithChildren
   '/jobs/$id': typeof JobsIdRoute
   '/_authenticated/admin/applications': typeof AuthenticatedAdminApplicationsRouteWithChildren
   '/_authenticated/admin/jobs': typeof AuthenticatedAdminJobsRoute
   '/_authenticated/apply/$id': typeof AuthenticatedApplyIdRoute
+  '/_authenticated/profile/edit': typeof AuthenticatedProfileEditRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/applications/$id': typeof AuthenticatedAdminApplicationsIdRoute
 }
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/admin/applications'
     | '/admin/jobs'
     | '/apply/$id'
+    | '/profile/edit'
     | '/admin/'
     | '/admin/applications/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '/admin/applications'
     | '/admin/jobs'
     | '/apply/$id'
+    | '/profile/edit'
     | '/admin'
     | '/admin/applications/$id'
   id:
@@ -162,6 +174,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/applications'
     | '/_authenticated/admin/jobs'
     | '/_authenticated/apply/$id'
+    | '/_authenticated/profile/edit'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/applications/$id'
   fileRoutesById: FileRoutesById
@@ -232,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/profile/edit': {
+      id: '/_authenticated/profile/edit'
+      path: '/edit'
+      fullPath: '/profile/edit'
+      preLoaderRoute: typeof AuthenticatedProfileEditRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
+    }
     '/_authenticated/apply/$id': {
       id: '/_authenticated/apply/$id'
       path: '/apply/$id'
@@ -294,15 +314,26 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedProfileRouteChildren {
+  AuthenticatedProfileEditRoute: typeof AuthenticatedProfileEditRoute
+}
+
+const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
+  AuthenticatedProfileEditRoute: AuthenticatedProfileEditRoute,
+}
+
+const AuthenticatedProfileRouteWithChildren =
+  AuthenticatedProfileRoute._addFileChildren(AuthenticatedProfileRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
-  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRouteWithChildren
   AuthenticatedApplyIdRoute: typeof AuthenticatedApplyIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
-  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRouteWithChildren,
   AuthenticatedApplyIdRoute: AuthenticatedApplyIdRoute,
 }
 
