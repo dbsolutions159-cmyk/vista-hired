@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalJobCard } from "@/components/ExternalJobCard";
+import { LocationPicker } from "@/components/LocationPicker";
 import { fetchExternalJobs, type ExternalJob } from "@/lib/external-jobs.functions";
 
 export const Route = createFileRoute("/")({
