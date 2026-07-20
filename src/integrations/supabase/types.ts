@@ -110,62 +110,122 @@ export type Database = {
       }
       jobs: {
         Row: {
+          apply_url: string | null
+          benefits: string | null
           category: string | null
           company_logo_url: string | null
           company_name: string
+          company_website: string | null
+          country: string | null
           created_at: string
           created_by: string | null
+          department: string | null
           description: string
           employment_type: Database["public"]["Enums"]["employment_type"]
           experience: string | null
+          featured: boolean
+          hr_email: string | null
+          hr_name: string | null
+          hr_phone: string | null
           id: string
           location: string
+          openings: number | null
+          poster_role: Database["public"]["Enums"]["poster_role"]
+          poster_user_id: string | null
           published: boolean
+          qualification: string | null
+          rejection_reason: string | null
+          responsibilities: string | null
           salary_currency: string
           salary_max: number | null
           salary_min: number | null
+          skills: string[] | null
+          state: string | null
+          status: Database["public"]["Enums"]["job_status"]
           title: string
           updated_at: string
+          urgent: boolean
+          verified: boolean
           view_count: number
           work_type: Database["public"]["Enums"]["work_type"]
         }
         Insert: {
+          apply_url?: string | null
+          benefits?: string | null
           category?: string | null
           company_logo_url?: string | null
           company_name: string
+          company_website?: string | null
+          country?: string | null
           created_at?: string
           created_by?: string | null
+          department?: string | null
           description: string
           employment_type?: Database["public"]["Enums"]["employment_type"]
           experience?: string | null
+          featured?: boolean
+          hr_email?: string | null
+          hr_name?: string | null
+          hr_phone?: string | null
           id?: string
           location: string
+          openings?: number | null
+          poster_role?: Database["public"]["Enums"]["poster_role"]
+          poster_user_id?: string | null
           published?: boolean
+          qualification?: string | null
+          rejection_reason?: string | null
+          responsibilities?: string | null
           salary_currency?: string
           salary_max?: number | null
           salary_min?: number | null
+          skills?: string[] | null
+          state?: string | null
+          status?: Database["public"]["Enums"]["job_status"]
           title: string
           updated_at?: string
+          urgent?: boolean
+          verified?: boolean
           view_count?: number
           work_type?: Database["public"]["Enums"]["work_type"]
         }
         Update: {
+          apply_url?: string | null
+          benefits?: string | null
           category?: string | null
           company_logo_url?: string | null
           company_name?: string
+          company_website?: string | null
+          country?: string | null
           created_at?: string
           created_by?: string | null
+          department?: string | null
           description?: string
           employment_type?: Database["public"]["Enums"]["employment_type"]
           experience?: string | null
+          featured?: boolean
+          hr_email?: string | null
+          hr_name?: string | null
+          hr_phone?: string | null
           id?: string
           location?: string
+          openings?: number | null
+          poster_role?: Database["public"]["Enums"]["poster_role"]
+          poster_user_id?: string | null
           published?: boolean
+          qualification?: string | null
+          rejection_reason?: string | null
+          responsibilities?: string | null
           salary_currency?: string
           salary_max?: number | null
           salary_min?: number | null
+          skills?: string[] | null
+          state?: string | null
+          status?: Database["public"]["Enums"]["job_status"]
           title?: string
           updated_at?: string
+          urgent?: boolean
+          verified?: boolean
           view_count?: number
           work_type?: Database["public"]["Enums"]["work_type"]
         }
@@ -199,6 +259,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          link: string | null
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -380,6 +473,15 @@ export type Database = {
         | "contract"
         | "internship"
         | "freelance"
+      job_status:
+        | "draft"
+        | "pending"
+        | "approved"
+        | "live"
+        | "rejected"
+        | "expired"
+        | "closed"
+      poster_role: "admin" | "recruiter" | "employer" | "hr" | "consultancy"
       work_type: "onsite" | "remote" | "hybrid"
     }
     CompositeTypes: {
@@ -516,6 +618,16 @@ export const Constants = {
         "internship",
         "freelance",
       ],
+      job_status: [
+        "draft",
+        "pending",
+        "approved",
+        "live",
+        "rejected",
+        "expired",
+        "closed",
+      ],
+      poster_role: ["admin", "recruiter", "employer", "hr", "consultancy"],
       work_type: ["onsite", "remote", "hybrid"],
     },
   },
