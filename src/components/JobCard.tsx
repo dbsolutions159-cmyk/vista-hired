@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Building2, Heart, MapPin, MessageCircle, Send, Share2, Briefcase, BadgeCheck, Bookmark } from "lucide-react";
+import { Building2, Heart, MapPin, MessageCircle, Send, Share2, Briefcase, BadgeCheck, Bookmark, Star, Zap, Home, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,13 @@ export function JobCard({ job }: { job: Job }) {
   const [commentCount, setCommentCount] = useState(0);
   const [openComments, setOpenComments] = useState(false);
 
+  const j = job as any;
+  const verified = !!j.verified;
+  const isDirect = j.poster_role === "employer" || j.poster_role === "hr";
+  const isRecruiter = j.poster_role === "recruiter" || j.poster_role === "consultancy";
+  const featured = !!j.featured;
+  const urgent = !!j.urgent;
+
   useEffect(() => {
     supabase.from("likes").select("id, user_id", { count: "exact" }).eq("job_id", job.id).then(({ data, count }) => {
       setLikes(count ?? data?.length ?? 0);
@@ -31,7 +38,7 @@ export function JobCard({ job }: { job: Job }) {
 
   const requireAuth = () => {
     if (!user) {
-      toast.info("Sign in to continue", { description: "Google login required for likes, comments & apply.", action: { label: "Sign in", onClick: () => (window.location.href = "/auth") } });
+      toast.info("Sign in to continue", { action: { label: "Sign in", onClick: () => (window.location.href = "/auth") } });
       return false;
     }
     return true;
@@ -39,28 +46,14 @@ export function JobCard({ job }: { job: Job }) {
 
   const toggleLike = async () => {
     if (!requireAuth()) return;
-    if (liked) {
-      setLiked(false);
-      setLikes((l) => l - 1);
-      await supabase.from("likes").delete().eq("job_id", job.id).eq("user_id", user!.id);
-    } else {
-      setLiked(true);
-      setLikes((l) => l + 1);
-      await supabase.from("likes").insert({ job_id: job.id, user_id: user!.id });
-    }
+    if (liked) { setLiked(false); setLikes((l) => l - 1); await supabase.from("likes").delete().eq("job_id", job.id).eq("user_id", user!.id); }
+    else { setLiked(true); setLikes((l) => l + 1); await supabase.from("likes").insert({ job_id: job.id, user_id: user!.id }); }
   };
 
   const toggleSave = async () => {
     if (!requireAuth()) return;
-    if (saved) {
-      setSaved(false);
-      await supabase.from("saved_jobs").delete().eq("job_id", job.id).eq("user_id", user!.id);
-      toast("Removed from saved");
-    } else {
-      setSaved(true);
-      await supabase.from("saved_jobs").insert({ job_id: job.id, user_id: user!.id });
-      toast.success("Saved");
-    }
+    if (saved) { setSaved(false); await supabase.from("saved_jobs").delete().eq("job_id", job.id).eq("user_id", user!.id); toast("Removed from saved"); }
+    else { setSaved(true); await supabase.from("saved_jobs").insert({ job_id: job.id, user_id: user!.id }); toast.success("Saved"); }
   };
 
   const share = async () => {
@@ -68,28 +61,20 @@ export function JobCard({ job }: { job: Job }) {
     const data = { title: `${job.title} — ${job.company_name}`, text: `Check out ${job.title} at ${job.company_name}`, url };
     try {
       if (navigator.share) await navigator.share(data);
-      else {
-        await navigator.clipboard.writeText(url);
-        toast.success("Link copied to clipboard");
-      }
+      else { await navigator.clipboard.writeText(url); toast.success("Link copied"); }
     } catch {}
   };
 
   return (
-    <Card className="group overflow-hidden border-border/70 bg-card shadow-soft transition-all hover:shadow-elevated">
+    <Card className={`group overflow-hidden border-border/70 bg-card shadow-soft transition-all hover:shadow-elevated ${featured ? "ring-1 ring-primary/40" : ""}`}>
       <div className="p-5">
         <div className="flex items-start gap-4">
           <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border bg-gradient-to-br from-primary/10 to-primary/5">
-            {job.company_logo_url ? (
-              <img src={job.company_logo_url} alt="" className="h-12 w-12 rounded-xl object-cover" />
-            ) : (
-              <Building2 className="h-6 w-6 text-primary" />
-            )}
+            {job.company_logo_url ? <img src={job.company_logo_url} alt="" className="h-12 w-12 rounded-xl object-cover" /> : <Building2 className="h-6 w-6 text-primary" />}
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <span className="font-medium text-foreground">{job.company_name}</span>
-              <BadgeCheck className="h-3.5 w-3.5 text-primary" />
               <span>· {timeAgo(job.created_at)}</span>
             </div>
             <Link to="/jobs/$id" params={{ id: job.id }} className="mt-0.5 block">
@@ -101,9 +86,14 @@ export function JobCard({ job }: { job: Job }) {
               <span className="font-semibold text-foreground">{formatSalary(job)}</span>
             </div>
             <div className="mt-2 flex flex-wrap gap-1.5">
+              {verified && <Badge className="rounded-full gradient-primary text-primary-foreground gap-1"><BadgeCheck className="h-3 w-3" />Verified by HireSetu</Badge>}
+              {isDirect && <Badge variant="outline" className="rounded-full border-emerald-500/50 text-emerald-600 gap-1"><Building2 className="h-3 w-3" />Direct Employer</Badge>}
+              {isRecruiter && <Badge variant="outline" className="rounded-full gap-1"><UserRound className="h-3 w-3" />Recruiter Posted</Badge>}
+              {urgent && <Badge className="rounded-full bg-rose-500 text-white gap-1"><Zap className="h-3 w-3" />Urgent Hiring</Badge>}
+              {featured && <Badge className="rounded-full bg-amber-500 text-white gap-1"><Star className="h-3 w-3" />Featured</Badge>}
+              {job.work_type === "remote" && <Badge variant="secondary" className="rounded-full gap-1"><Home className="h-3 w-3" />Work From Home</Badge>}
               <Badge variant="secondary" className="rounded-full">{workTypeLabels[job.work_type]}</Badge>
               <Badge variant="secondary" className="rounded-full">{employmentTypeLabels[job.employment_type]}</Badge>
-              {job.category && <Badge variant="outline" className="rounded-full">{job.category}</Badge>}
             </div>
             <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">{job.description}</p>
           </div>
@@ -130,18 +120,12 @@ export function JobCard({ job }: { job: Job }) {
         </div>
         <Button size="sm" asChild className="gradient-primary text-primary-foreground shadow-soft">
           <Link to="/apply/$id" params={{ id: job.id }}>
-            <Send className="mr-1.5 h-3.5 w-3.5" />
-            Apply
+            <Send className="mr-1.5 h-3.5 w-3.5" />Apply
           </Link>
         </Button>
       </div>
 
-      <CommentsSheet
-        jobId={job.id}
-        open={openComments}
-        onOpenChange={setOpenComments}
-        onCountChange={setCommentCount}
-      />
+      <CommentsSheet jobId={job.id} open={openComments} onOpenChange={setOpenComments} onCountChange={setCommentCount} />
     </Card>
   );
 }

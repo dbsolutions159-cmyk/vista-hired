@@ -1,5 +1,5 @@
 import { Link, useRouter } from "@tanstack/react-router";
-import { Briefcase, LogOut, Moon, Shield, Sun, User as UserIcon } from "lucide-react";
+import { Briefcase, LogOut, Moon, PlusCircle, Shield, Sun, User as UserIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { NotificationBell } from "@/components/NotificationBell";
 
 export function SiteHeader() {
   const { user, isAdmin } = useAuth();
@@ -58,15 +59,18 @@ export function SiteHeader() {
         </Link>
 
         <div className="flex items-center gap-2">
+          <Button asChild size="sm" variant="outline" className="hidden sm:inline-flex border-primary/40 text-primary hover:bg-primary/10">
+            <Link to="/post-job"><PlusCircle className="mr-1.5 h-4 w-4" />Post a Job</Link>
+          </Button>
           {isAdmin && (
             <Button asChild size="sm" variant="outline" className="hidden sm:inline-flex border-primary/40 text-primary hover:bg-primary/10">
-              <Link to="/admin"><Shield className="mr-1.5 h-4 w-4" />Admin Dashboard</Link>
+              <Link to="/admin"><Shield className="mr-1.5 h-4 w-4" />Admin</Link>
             </Button>
           )}
+          <NotificationBell />
           <Button variant="ghost" size="icon" onClick={toggleDark} aria-label="Toggle theme">
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
-
 
           {user ? (
             <DropdownMenu>
@@ -82,6 +86,7 @@ export function SiteHeader() {
                 <DropdownMenuLabel className="truncate">{user.email}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild><Link to="/profile"><UserIcon className="mr-2 h-4 w-4" />My profile</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/post-job"><PlusCircle className="mr-2 h-4 w-4" />Post a job</Link></DropdownMenuItem>
                 {isAdmin && (
                   <DropdownMenuItem asChild><Link to="/admin"><Shield className="mr-2 h-4 w-4" />Admin</Link></DropdownMenuItem>
                 )}
