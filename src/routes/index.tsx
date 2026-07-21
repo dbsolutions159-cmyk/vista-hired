@@ -172,11 +172,13 @@ function HomePage() {
         <div className="mb-4 flex items-baseline justify-between">
           <h2 className="font-display text-xl font-semibold">Latest jobs</h2>
           <span className="text-xs text-muted-foreground">
-            {isFetching ? "Loading…" : `${filtered.length} of ${data?.counts.total ?? 0} results`}
+            {isFetching || internalLoading
+              ? "Loading…"
+              : `${filteredInternal.length + filtered.length} results`}
           </span>
         </div>
 
-        {isLoading ? (
+        {isLoading && internalLoading ? (
           <div className="space-y-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="rounded-xl border p-5">
@@ -184,15 +186,20 @@ function HomePage() {
               </div>
             ))}
           </div>
-        ) : filtered.length ? (
+        ) : filteredInternal.length || filtered.length ? (
           <div className="space-y-4 animate-in fade-in duration-500">
+            {filteredInternal.map((j) => <JobCard key={j.id} job={j} />)}
             {filtered.map((j) => <ExternalJobCard key={j.id} job={j} />)}
           </div>
         ) : (
           <div className="rounded-xl border border-dashed p-10 text-center">
             <SearchX className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
-            <p className="text-sm font-medium">No jobs found</p>
-            <p className="mt-1 text-xs text-muted-foreground">Try a different keyword, clear the location, or switch to "All Jobs".</p>
+            <p className="text-sm font-medium">No jobs available</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {committed.q || committed.location || filter !== "all"
+                ? "Try a different keyword, clear the location, or switch to \"All Jobs\"."
+                : "Check back soon — new roles are posted every day."}
+            </p>
             {(committed.q || committed.location || filter !== "all") && (
               <Button variant="outline" size="sm" className="mt-4" onClick={() => { setQ(""); setLocation(""); setCommitted({ q: "", location: "" }); setFilter("all"); }}>Reset filters</Button>
             )}
