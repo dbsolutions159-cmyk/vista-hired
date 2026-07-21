@@ -1,38 +1,125 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams, notFound } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Building2, MapPin, Briefcase, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { employmentTypeLabels, formatSalary, timeAgo, workTypeLabels } from "@/lib/jobs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Card } from "@/components/ui/card";
+import ogFallback from "@/assets/hiresetu-og.jpg.asset.json";
+
+const SITE_URL = "https://hiresetu-ai.lovable.app";
 
 export const Route = createFileRoute("/jobs/$id")({
+  loader: async ({ params }) => {
+    const { data, error } = await supabase
+      .from("jobs")
+      .select("*")
+      .eq("id", params.id)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) throw notFound();
+    return { job: data };
+  },
+  head: ({ loaderData }) => {
+    const job = loaderData?.job;
+    if (!job) {
+      return {
+        meta: [{ title: "Job not found — HireSetu" }],
+      };
+    }
+    const url = `${SITE_URL}/jobs/${job.id}`;
+    const title = `${job.title} at ${job.company_name} — HireSetu`;
+    const salary = formatSalary(job);
+    const descBits = [
+      job.company_name,
+      job.location,
+      salary !== "Not disclosed" ? salary : null,
+      workTypeLabels[job.work_type],
+      employmentTypeLabels[job.employment_type],
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    const raw = (job.description || "").replace(/\s+/g, " ").trim();
+    const shortDesc = raw.length > 140 ? raw.slice(0, 137) + "…" : raw;
+    const description = `${descBits}. ${shortDesc} Apply now on HireSetu.`.slice(0, 300);
+    const image = job.company_logo_url && /^https?:\/\//.test(job.company_logo_url)
+      ? job.company_logo_url
+      : `${SITE_URL}${ogFallback.url}`;
+
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "article" },
+        { property: "og:url", content: url },
+        { property: "og:image", content: image },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { property: "og:site_name", content: "HireSetu" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: image },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "JobPosting",
+            title: job.title,
+            description: job.description,
+            datePosted: job.created_at,
+            employmentType: employmentTypeLabels[job.employment_type],
+            hiringOrganization: {
+              "@type": "Organization",
+              name: job.company_name,
+              logo: job.company_logo_url || undefined,
+            },
+            jobLocation: {
+              "@type": "Place",
+              address: { "@type": "PostalAddress", addressLocality: job.location },
+            },
+            baseSalary: job.salary_min
+              ? {
+                  "@type": "MonetaryAmount",
+                  currency: job.salary_currency || "INR",
+                  value: {
+                    "@type": "QuantitativeValue",
+                    minValue: job.salary_min,
+                    maxValue: job.salary_max || job.salary_min,
+                    unitText: "YEAR",
+                  },
+                }
+              : undefined,
+            url,
+          }),
+        },
+      ],
+    };
+  },
   component: JobDetail,
+  notFoundComponent: () => (
+    <div className="mx-auto max-w-3xl p-10 text-center text-muted-foreground">Job not found.</div>
+  ),
+  errorComponent: ({ error }) => (
+    <div className="mx-auto max-w-3xl p-10 text-center text-muted-foreground">
+      Couldn't load this job. {error.message}
+    </div>
+  ),
 });
 
 function JobDetail() {
   const { id } = useParams({ from: "/jobs/$id" });
-  const { data: job, isLoading } = useQuery({
-    queryKey: ["job", id],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("jobs").select("*").eq("id", id).maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-  });
+  const { job } = Route.useLoaderData();
 
   useEffect(() => {
     if (id) supabase.rpc("increment_job_view", { _job_id: id });
   }, [id]);
-
-
-  if (isLoading) {
-    return <div className="mx-auto max-w-3xl p-6 space-y-4"><Skeleton className="h-40 w-full" /><Skeleton className="h-6 w-2/3" /><Skeleton className="h-40 w-full" /></div>;
-  }
-  if (!job) return <div className="mx-auto max-w-3xl p-10 text-center text-muted-foreground">Job not found.</div>;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
