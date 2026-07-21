@@ -1,13 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { Search, Sparkles, SearchX } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalJobCard } from "@/components/ExternalJobCard";
+import { JobCard } from "@/components/JobCard";
 import { LocationPicker } from "@/components/LocationPicker";
 import { fetchExternalJobs, type ExternalJob } from "@/lib/external-jobs.functions";
+import { supabase } from "@/integrations/supabase/client";
+import type { Job } from "@/lib/jobs";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -47,11 +50,34 @@ function matches(job: ExternalJob, filter: FilterKey, query: string): boolean {
   return true;
 }
 
+function matchesInternal(job: Job, filter: FilterKey, committed: { q: string; location: string }): boolean {
+  const hayBase = `${job.title} ${job.company_name} ${job.description ?? ""} ${(job as any).skills?.join?.(" ") ?? ""}`;
+  const isRemote = job.work_type === "remote" || job.work_type === "hybrid";
+  if (filter !== "all") {
+    if (filter === "remote" && !isRemote) return false;
+    if (filter === "wfh" && !(isRemote || /work from home|wfh/i.test(job.location + " " + hayBase))) return false;
+    if (filter === "full_time" && job.employment_type !== "full_time") return false;
+    if (filter === "part_time" && job.employment_type !== "part_time") return false;
+    if (filter === "internship" && job.employment_type !== "internship") return false;
+    if (filter === "freshers" && !FRESHER_RX.test(hayBase)) return false;
+    if (filter === "experienced" && !EXP_RX.test(hayBase)) return false;
+  }
+  if (committed.q) {
+    const q = committed.q.toLowerCase();
+    if (!`${hayBase}`.toLowerCase().includes(q)) return false;
+  }
+  if (committed.location) {
+    if (!(job.location || "").toLowerCase().includes(committed.location.toLowerCase())) return false;
+  }
+  return true;
+}
+
 function HomePage() {
   const [q, setQ] = useState("");
   const [location, setLocation] = useState("");
   const [committed, setCommitted] = useState<{ q: string; location: string }>({ q: "", location: "" });
   const [filter, setFilter] = useState<FilterKey>("all");
+  const queryClient = useQueryClient();
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ["external-jobs", committed],
@@ -59,12 +85,44 @@ function HomePage() {
     staleTime: 60_000,
   });
 
+  const { data: internalJobs, isLoading: internalLoading } = useQuery({
+    queryKey: ["internal-jobs"],
+    queryFn: async (): Promise<Job[]> => {
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("*")
+        .eq("status", "live")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return (data ?? []) as Job[];
+    },
+    staleTime: 30_000,
+  });
+
+  // Realtime: refresh when jobs are inserted/updated/deleted
+  useEffect(() => {
+    const channel = supabase
+      .channel("jobs-home-feed")
+      .on("postgres_changes", { event: "*", schema: "public", table: "jobs" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["internal-jobs"] });
+      })
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
   const submit = (e?: React.FormEvent) => {
     e?.preventDefault();
     setCommitted({ q: q.trim(), location: location.trim() });
   };
 
   const filtered = useMemo(() => (data?.jobs ?? []).filter((j) => matches(j, filter, "")), [data, filter]);
+  const filteredInternal = useMemo(
+    () => (internalJobs ?? []).filter((j) => matchesInternal(j, filter, committed)),
+    [internalJobs, filter, committed],
+  );
 
   return (
     <>
@@ -114,11 +172,13 @@ function HomePage() {
         <div className="mb-4 flex items-baseline justify-between">
           <h2 className="font-display text-xl font-semibold">Latest jobs</h2>
           <span className="text-xs text-muted-foreground">
-            {isFetching ? "Loading…" : `${filtered.length} of ${data?.counts.total ?? 0} results`}
+            {isFetching || internalLoading
+              ? "Loading…"
+              : `${filteredInternal.length + filtered.length} results`}
           </span>
         </div>
 
-        {isLoading ? (
+        {isLoading && internalLoading ? (
           <div className="space-y-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="rounded-xl border p-5">
@@ -126,15 +186,20 @@ function HomePage() {
               </div>
             ))}
           </div>
-        ) : filtered.length ? (
+        ) : filteredInternal.length || filtered.length ? (
           <div className="space-y-4 animate-in fade-in duration-500">
+            {filteredInternal.map((j) => <JobCard key={j.id} job={j} />)}
             {filtered.map((j) => <ExternalJobCard key={j.id} job={j} />)}
           </div>
         ) : (
           <div className="rounded-xl border border-dashed p-10 text-center">
             <SearchX className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
-            <p className="text-sm font-medium">No jobs found</p>
-            <p className="mt-1 text-xs text-muted-foreground">Try a different keyword, clear the location, or switch to "All Jobs".</p>
+            <p className="text-sm font-medium">No jobs available</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {committed.q || committed.location || filter !== "all"
+                ? "Try a different keyword, clear the location, or switch to \"All Jobs\"."
+                : "Check back soon — new roles are posted every day."}
+            </p>
             {(committed.q || committed.location || filter !== "all") && (
               <Button variant="outline" size="sm" className="mt-4" onClick={() => { setQ(""); setLocation(""); setCommitted({ q: "", location: "" }); setFilter("all"); }}>Reset filters</Button>
             )}
