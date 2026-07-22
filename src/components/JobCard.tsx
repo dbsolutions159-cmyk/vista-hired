@@ -65,8 +65,22 @@ export function JobCard({ job }: { job: Job }) {
     } catch {}
   };
 
+  const cover = (job as any).cover_image_url as string | undefined;
+  const video = (job as any).video_url as string | undefined;
   return (
     <Card className={`group overflow-hidden border-border/70 bg-card shadow-soft transition-all hover:shadow-elevated ${featured ? "ring-1 ring-primary/40" : ""}`}>
+      {cover && (
+        <Link to="/jobs/$id" params={{ id: job.id }} className="block">
+          <div className="relative">
+            <img src={cover} alt="" className="h-36 w-full object-cover sm:h-44" loading="lazy" />
+            {video && (
+              <span className="absolute right-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white">
+                ▶ Video
+              </span>
+            )}
+          </div>
+        </Link>
+      )}
       <div className="p-5">
         <div className="flex items-start gap-4">
           <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border bg-gradient-to-br from-primary/10 to-primary/5">

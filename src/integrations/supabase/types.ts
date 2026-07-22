@@ -117,6 +117,7 @@ export type Database = {
           company_name: string
           company_website: string | null
           country: string | null
+          cover_image_url: string | null
           created_at: string
           created_by: string | null
           department: string | null
@@ -146,6 +147,7 @@ export type Database = {
           updated_at: string
           urgent: boolean
           verified: boolean
+          video_url: string | null
           view_count: number
           work_type: Database["public"]["Enums"]["work_type"]
         }
@@ -157,6 +159,7 @@ export type Database = {
           company_name: string
           company_website?: string | null
           country?: string | null
+          cover_image_url?: string | null
           created_at?: string
           created_by?: string | null
           department?: string | null
@@ -186,6 +189,7 @@ export type Database = {
           updated_at?: string
           urgent?: boolean
           verified?: boolean
+          video_url?: string | null
           view_count?: number
           work_type?: Database["public"]["Enums"]["work_type"]
         }
@@ -197,6 +201,7 @@ export type Database = {
           company_name?: string
           company_website?: string | null
           country?: string | null
+          cover_image_url?: string | null
           created_at?: string
           created_by?: string | null
           department?: string | null
@@ -226,6 +231,7 @@ export type Database = {
           updated_at?: string
           urgent?: boolean
           verified?: boolean
+          video_url?: string | null
           view_count?: number
           work_type?: Database["public"]["Enums"]["work_type"]
         }
