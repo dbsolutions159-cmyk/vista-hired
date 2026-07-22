@@ -43,7 +43,10 @@ export const Route = createFileRoute("/jobs/$id")({
     const raw = (job.description || "").replace(/\s+/g, " ").trim();
     const shortDesc = raw.length > 140 ? raw.slice(0, 137) + "…" : raw;
     const description = `${descBits}. ${shortDesc} Apply now on HireSetu.`.slice(0, 300);
-    const image = job.company_logo_url && /^https?:\/\//.test(job.company_logo_url)
+    const coverCandidate = (job as any).cover_image_url as string | undefined;
+    const image = coverCandidate && /^https?:\/\//.test(coverCandidate)
+      ? coverCandidate
+      : job.company_logo_url && /^https?:\/\//.test(job.company_logo_url)
       ? job.company_logo_url
       : `${SITE_URL}${ogFallback.url}`;
 
