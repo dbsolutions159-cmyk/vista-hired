@@ -199,6 +199,4 @@ function Section({ title, body }: { title: string; body: string }) {
     </div>
   );
 }
-    </div>
-  );
-}
+
