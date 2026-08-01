@@ -14,6 +14,76 @@ export type Database = {
   }
   public: {
     Tables: {
+      application_events: {
+        Row: {
+          actor_id: string | null
+          application_id: string
+          created_at: string
+          from_stage: Database["public"]["Enums"]["application_stage"] | null
+          id: string
+          note: string | null
+          to_stage: Database["public"]["Enums"]["application_stage"]
+        }
+        Insert: {
+          actor_id?: string | null
+          application_id: string
+          created_at?: string
+          from_stage?: Database["public"]["Enums"]["application_stage"] | null
+          id?: string
+          note?: string | null
+          to_stage: Database["public"]["Enums"]["application_stage"]
+        }
+        Update: {
+          actor_id?: string | null
+          application_id?: string
+          created_at?: string
+          from_stage?: Database["public"]["Enums"]["application_stage"] | null
+          id?: string
+          note?: string | null
+          to_stage?: Database["public"]["Enums"]["application_stage"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_events_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      application_notes: {
+        Row: {
+          application_id: string
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          application_id: string
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          application_id?: string
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "application_notes_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       applications: {
         Row: {
           city: string
@@ -29,7 +99,9 @@ export type Database = {
           qualification: string
           resume_path: string
           resume_url: string
+          stage: Database["public"]["Enums"]["application_stage"]
           status: string
+          updated_at: string
           user_id: string
         }
         Insert: {
@@ -46,7 +118,9 @@ export type Database = {
           qualification: string
           resume_path: string
           resume_url: string
+          stage?: Database["public"]["Enums"]["application_stage"]
           status?: string
+          updated_at?: string
           user_id: string
         }
         Update: {
@@ -63,7 +137,9 @@ export type Database = {
           qualification?: string
           resume_path?: string
           resume_url?: string
+          stage?: Database["public"]["Enums"]["application_stage"]
           status?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -75,6 +151,81 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      candidate_education: {
+        Row: {
+          created_at: string
+          degree: string
+          end_year: string | null
+          field_of_study: string | null
+          grade: string | null
+          id: string
+          institution: string
+          start_year: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          degree: string
+          end_year?: string | null
+          field_of_study?: string | null
+          grade?: string | null
+          id?: string
+          institution: string
+          start_year?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          degree?: string
+          end_year?: string | null
+          field_of_study?: string | null
+          grade?: string | null
+          id?: string
+          institution?: string
+          start_year?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      candidate_experience: {
+        Row: {
+          company: string
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          is_current: boolean
+          job_title: string
+          location: string | null
+          start_date: string | null
+          user_id: string
+        }
+        Insert: {
+          company: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_current?: boolean
+          job_title: string
+          location?: string | null
+          start_date?: string | null
+          user_id: string
+        }
+        Update: {
+          company?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          is_current?: boolean
+          job_title?: string
+          location?: string | null
+          start_date?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       comments: {
         Row: {
@@ -101,6 +252,75 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "comments_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interviews: {
+        Row: {
+          application_id: string
+          candidate_id: string
+          created_at: string
+          created_by: string | null
+          duration_minutes: number
+          id: string
+          interviewer_name: string | null
+          job_id: string
+          location: string | null
+          meeting_link: string | null
+          mode: string
+          notes: string | null
+          scheduled_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          application_id: string
+          candidate_id: string
+          created_at?: string
+          created_by?: string | null
+          duration_minutes?: number
+          id?: string
+          interviewer_name?: string | null
+          job_id: string
+          location?: string | null
+          meeting_link?: string | null
+          mode?: string
+          notes?: string | null
+          scheduled_at: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          application_id?: string
+          candidate_id?: string
+          created_at?: string
+          created_by?: string | null
+          duration_minutes?: number
+          id?: string
+          interviewer_name?: string | null
+          job_id?: string
+          location?: string | null
+          meeting_link?: string | null
+          mode?: string
+          notes?: string | null
+          scheduled_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interviews_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "applications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interviews_job_id_fkey"
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "jobs"
@@ -470,9 +690,26 @@ export type Database = {
         Returns: boolean
       }
       increment_job_view: { Args: { _job_id: string }; Returns: undefined }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
+      owns_job: {
+        Args: { _job_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "user"
+      application_stage:
+        | "applied"
+        | "under_review"
+        | "shortlisted"
+        | "interview_scheduled"
+        | "interview_completed"
+        | "selected"
+        | "offer_sent"
+        | "offer_accepted"
+        | "hired"
+        | "rejected"
+        | "withdrawn"
       employment_type:
         | "full_time"
         | "part_time"
@@ -487,6 +724,7 @@ export type Database = {
         | "rejected"
         | "expired"
         | "closed"
+        | "paused"
       poster_role: "admin" | "recruiter" | "employer" | "hr" | "consultancy"
       work_type: "onsite" | "remote" | "hybrid"
     }
@@ -617,6 +855,19 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      application_stage: [
+        "applied",
+        "under_review",
+        "shortlisted",
+        "interview_scheduled",
+        "interview_completed",
+        "selected",
+        "offer_sent",
+        "offer_accepted",
+        "hired",
+        "rejected",
+        "withdrawn",
+      ],
       employment_type: [
         "full_time",
         "part_time",
@@ -632,6 +883,7 @@ export const Constants = {
         "rejected",
         "expired",
         "closed",
+        "paused",
       ],
       poster_role: ["admin", "recruiter", "employer", "hr", "consultancy"],
       work_type: ["onsite", "remote", "hybrid"],

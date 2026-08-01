@@ -16,13 +16,19 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedHiringRouteImport } from './routes/_authenticated/hiring'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedHiringIndexRouteImport } from './routes/_authenticated/hiring.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedProfileEditRouteImport } from './routes/_authenticated/profile.edit'
+import { Route as AuthenticatedHiringJobsRouteImport } from './routes/_authenticated/hiring.jobs'
+import { Route as AuthenticatedHiringInterviewsRouteImport } from './routes/_authenticated/hiring.interviews'
+import { Route as AuthenticatedHiringApplicantsRouteImport } from './routes/_authenticated/hiring.applicants'
 import { Route as AuthenticatedApplyIdRouteImport } from './routes/_authenticated/apply.$id'
 import { Route as AuthenticatedAdminSubmissionsRouteImport } from './routes/_authenticated/admin.submissions'
 import { Route as AuthenticatedAdminJobsRouteImport } from './routes/_authenticated/admin.jobs'
 import { Route as AuthenticatedAdminApplicationsRouteImport } from './routes/_authenticated/admin.applications'
+import { Route as AuthenticatedHiringCandidatesAppIdRouteImport } from './routes/_authenticated/hiring.candidates.$appId'
 import { Route as AuthenticatedAdminApplicationsIdRouteImport } from './routes/_authenticated/admin.applications.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -59,11 +65,22 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedHiringRoute = AuthenticatedHiringRouteImport.update({
+  id: '/hiring',
+  path: '/hiring',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedHiringIndexRoute =
+  AuthenticatedHiringIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedHiringRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -74,6 +91,23 @@ const AuthenticatedProfileEditRoute =
     id: '/edit',
     path: '/edit',
     getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
+const AuthenticatedHiringJobsRoute = AuthenticatedHiringJobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => AuthenticatedHiringRoute,
+} as any)
+const AuthenticatedHiringInterviewsRoute =
+  AuthenticatedHiringInterviewsRouteImport.update({
+    id: '/interviews',
+    path: '/interviews',
+    getParentRoute: () => AuthenticatedHiringRoute,
+  } as any)
+const AuthenticatedHiringApplicantsRoute =
+  AuthenticatedHiringApplicantsRouteImport.update({
+    id: '/applicants',
+    path: '/applicants',
+    getParentRoute: () => AuthenticatedHiringRoute,
   } as any)
 const AuthenticatedApplyIdRoute = AuthenticatedApplyIdRouteImport.update({
   id: '/apply/$id',
@@ -97,6 +131,12 @@ const AuthenticatedAdminApplicationsRoute =
     path: '/applications',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedHiringCandidatesAppIdRoute =
+  AuthenticatedHiringCandidatesAppIdRouteImport.update({
+    id: '/candidates/$appId',
+    path: '/candidates/$appId',
+    getParentRoute: () => AuthenticatedHiringRoute,
+  } as any)
 const AuthenticatedAdminApplicationsIdRoute =
   AuthenticatedAdminApplicationsIdRouteImport.update({
     id: '/$id',
@@ -110,15 +150,21 @@ export interface FileRoutesByFullPath {
   '/post-job': typeof PostJobRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/hiring': typeof AuthenticatedHiringRouteWithChildren
   '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/jobs/$id': typeof JobsIdRoute
   '/admin/applications': typeof AuthenticatedAdminApplicationsRouteWithChildren
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
   '/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
   '/apply/$id': typeof AuthenticatedApplyIdRoute
+  '/hiring/applicants': typeof AuthenticatedHiringApplicantsRoute
+  '/hiring/interviews': typeof AuthenticatedHiringInterviewsRoute
+  '/hiring/jobs': typeof AuthenticatedHiringJobsRoute
   '/profile/edit': typeof AuthenticatedProfileEditRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/hiring/': typeof AuthenticatedHiringIndexRoute
   '/admin/applications/$id': typeof AuthenticatedAdminApplicationsIdRoute
+  '/hiring/candidates/$appId': typeof AuthenticatedHiringCandidatesAppIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -131,9 +177,14 @@ export interface FileRoutesByTo {
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
   '/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
   '/apply/$id': typeof AuthenticatedApplyIdRoute
+  '/hiring/applicants': typeof AuthenticatedHiringApplicantsRoute
+  '/hiring/interviews': typeof AuthenticatedHiringInterviewsRoute
+  '/hiring/jobs': typeof AuthenticatedHiringJobsRoute
   '/profile/edit': typeof AuthenticatedProfileEditRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/hiring': typeof AuthenticatedHiringIndexRoute
   '/admin/applications/$id': typeof AuthenticatedAdminApplicationsIdRoute
+  '/hiring/candidates/$appId': typeof AuthenticatedHiringCandidatesAppIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -143,15 +194,21 @@ export interface FileRoutesById {
   '/post-job': typeof PostJobRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/hiring': typeof AuthenticatedHiringRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRouteWithChildren
   '/jobs/$id': typeof JobsIdRoute
   '/_authenticated/admin/applications': typeof AuthenticatedAdminApplicationsRouteWithChildren
   '/_authenticated/admin/jobs': typeof AuthenticatedAdminJobsRoute
   '/_authenticated/admin/submissions': typeof AuthenticatedAdminSubmissionsRoute
   '/_authenticated/apply/$id': typeof AuthenticatedApplyIdRoute
+  '/_authenticated/hiring/applicants': typeof AuthenticatedHiringApplicantsRoute
+  '/_authenticated/hiring/interviews': typeof AuthenticatedHiringInterviewsRoute
+  '/_authenticated/hiring/jobs': typeof AuthenticatedHiringJobsRoute
   '/_authenticated/profile/edit': typeof AuthenticatedProfileEditRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/hiring/': typeof AuthenticatedHiringIndexRoute
   '/_authenticated/admin/applications/$id': typeof AuthenticatedAdminApplicationsIdRoute
+  '/_authenticated/hiring/candidates/$appId': typeof AuthenticatedHiringCandidatesAppIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -161,15 +218,21 @@ export interface FileRouteTypes {
     | '/post-job'
     | '/sitemap.xml'
     | '/admin'
+    | '/hiring'
     | '/profile'
     | '/jobs/$id'
     | '/admin/applications'
     | '/admin/jobs'
     | '/admin/submissions'
     | '/apply/$id'
+    | '/hiring/applicants'
+    | '/hiring/interviews'
+    | '/hiring/jobs'
     | '/profile/edit'
     | '/admin/'
+    | '/hiring/'
     | '/admin/applications/$id'
+    | '/hiring/candidates/$appId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -182,9 +245,14 @@ export interface FileRouteTypes {
     | '/admin/jobs'
     | '/admin/submissions'
     | '/apply/$id'
+    | '/hiring/applicants'
+    | '/hiring/interviews'
+    | '/hiring/jobs'
     | '/profile/edit'
     | '/admin'
+    | '/hiring'
     | '/admin/applications/$id'
+    | '/hiring/candidates/$appId'
   id:
     | '__root__'
     | '/'
@@ -193,15 +261,21 @@ export interface FileRouteTypes {
     | '/post-job'
     | '/sitemap.xml'
     | '/_authenticated/admin'
+    | '/_authenticated/hiring'
     | '/_authenticated/profile'
     | '/jobs/$id'
     | '/_authenticated/admin/applications'
     | '/_authenticated/admin/jobs'
     | '/_authenticated/admin/submissions'
     | '/_authenticated/apply/$id'
+    | '/_authenticated/hiring/applicants'
+    | '/_authenticated/hiring/interviews'
+    | '/_authenticated/hiring/jobs'
     | '/_authenticated/profile/edit'
     | '/_authenticated/admin/'
+    | '/_authenticated/hiring/'
     | '/_authenticated/admin/applications/$id'
+    | '/_authenticated/hiring/candidates/$appId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -264,12 +338,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/hiring': {
+      id: '/_authenticated/hiring'
+      path: '/hiring'
+      fullPath: '/hiring'
+      preLoaderRoute: typeof AuthenticatedHiringRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/hiring/': {
+      id: '/_authenticated/hiring/'
+      path: '/'
+      fullPath: '/hiring/'
+      preLoaderRoute: typeof AuthenticatedHiringIndexRouteImport
+      parentRoute: typeof AuthenticatedHiringRoute
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
@@ -284,6 +372,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/profile/edit'
       preLoaderRoute: typeof AuthenticatedProfileEditRouteImport
       parentRoute: typeof AuthenticatedProfileRoute
+    }
+    '/_authenticated/hiring/jobs': {
+      id: '/_authenticated/hiring/jobs'
+      path: '/jobs'
+      fullPath: '/hiring/jobs'
+      preLoaderRoute: typeof AuthenticatedHiringJobsRouteImport
+      parentRoute: typeof AuthenticatedHiringRoute
+    }
+    '/_authenticated/hiring/interviews': {
+      id: '/_authenticated/hiring/interviews'
+      path: '/interviews'
+      fullPath: '/hiring/interviews'
+      preLoaderRoute: typeof AuthenticatedHiringInterviewsRouteImport
+      parentRoute: typeof AuthenticatedHiringRoute
+    }
+    '/_authenticated/hiring/applicants': {
+      id: '/_authenticated/hiring/applicants'
+      path: '/applicants'
+      fullPath: '/hiring/applicants'
+      preLoaderRoute: typeof AuthenticatedHiringApplicantsRouteImport
+      parentRoute: typeof AuthenticatedHiringRoute
     }
     '/_authenticated/apply/$id': {
       id: '/_authenticated/apply/$id'
@@ -312,6 +421,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/applications'
       preLoaderRoute: typeof AuthenticatedAdminApplicationsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/hiring/candidates/$appId': {
+      id: '/_authenticated/hiring/candidates/$appId'
+      path: '/candidates/$appId'
+      fullPath: '/hiring/candidates/$appId'
+      preLoaderRoute: typeof AuthenticatedHiringCandidatesAppIdRouteImport
+      parentRoute: typeof AuthenticatedHiringRoute
     }
     '/_authenticated/admin/applications/$id': {
       id: '/_authenticated/admin/applications/$id'
@@ -356,6 +472,26 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedHiringRouteChildren {
+  AuthenticatedHiringApplicantsRoute: typeof AuthenticatedHiringApplicantsRoute
+  AuthenticatedHiringInterviewsRoute: typeof AuthenticatedHiringInterviewsRoute
+  AuthenticatedHiringJobsRoute: typeof AuthenticatedHiringJobsRoute
+  AuthenticatedHiringIndexRoute: typeof AuthenticatedHiringIndexRoute
+  AuthenticatedHiringCandidatesAppIdRoute: typeof AuthenticatedHiringCandidatesAppIdRoute
+}
+
+const AuthenticatedHiringRouteChildren: AuthenticatedHiringRouteChildren = {
+  AuthenticatedHiringApplicantsRoute: AuthenticatedHiringApplicantsRoute,
+  AuthenticatedHiringInterviewsRoute: AuthenticatedHiringInterviewsRoute,
+  AuthenticatedHiringJobsRoute: AuthenticatedHiringJobsRoute,
+  AuthenticatedHiringIndexRoute: AuthenticatedHiringIndexRoute,
+  AuthenticatedHiringCandidatesAppIdRoute:
+    AuthenticatedHiringCandidatesAppIdRoute,
+}
+
+const AuthenticatedHiringRouteWithChildren =
+  AuthenticatedHiringRoute._addFileChildren(AuthenticatedHiringRouteChildren)
+
 interface AuthenticatedProfileRouteChildren {
   AuthenticatedProfileEditRoute: typeof AuthenticatedProfileEditRoute
 }
@@ -369,12 +505,14 @@ const AuthenticatedProfileRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedHiringRoute: typeof AuthenticatedHiringRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRouteWithChildren
   AuthenticatedApplyIdRoute: typeof AuthenticatedApplyIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedHiringRoute: AuthenticatedHiringRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRouteWithChildren,
   AuthenticatedApplyIdRoute: AuthenticatedApplyIdRoute,
 }
