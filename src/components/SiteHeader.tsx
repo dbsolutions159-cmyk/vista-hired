@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { NotificationBell } from "@/components/NotificationBell";
+import { ShareSubscriptionButton, SubscriptionButton, SUBSCRIPTION_MESSAGE, SUBSCRIPTION_URL } from "@/components/SubscriptionButtons";
 
 export function SiteHeader() {
   const { user, isAdmin } = useAuth();
