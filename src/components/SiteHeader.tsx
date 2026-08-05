@@ -1,5 +1,5 @@
 import { Link, useRouter } from "@tanstack/react-router";
-import { Briefcase, LogOut, Moon, PlusCircle, Shield, Sun, User as UserIcon } from "lucide-react";
+import { Briefcase, Crown, LogOut, Moon, PlusCircle, Share2, Shield, Sun, User as UserIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { NotificationBell } from "@/components/NotificationBell";
+import { SubscriptionButton, SUBSCRIPTION_MESSAGE, SUBSCRIPTION_URL } from "@/components/SubscriptionButtons";
 
 export function SiteHeader() {
   const { user, isAdmin } = useAuth();
@@ -62,12 +63,15 @@ export function SiteHeader() {
           <Button asChild size="sm" variant="outline" className="hidden sm:inline-flex border-primary/40 text-primary hover:bg-primary/10">
             <Link to="/post-job"><PlusCircle className="mr-1.5 h-4 w-4" />Post a Job</Link>
           </Button>
+          <SubscriptionButton className="hidden sm:inline-flex" />
+          <SubscriptionButton size="icon" iconOnly className="sm:hidden" />
           {isAdmin && (
             <Button asChild size="sm" variant="outline" className="hidden sm:inline-flex border-primary/40 text-primary hover:bg-primary/10">
               <Link to="/admin"><Shield className="mr-1.5 h-4 w-4" />Admin</Link>
             </Button>
           )}
           <NotificationBell />
+
           <Button variant="ghost" size="icon" onClick={toggleDark} aria-label="Toggle theme">
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
@@ -87,12 +91,19 @@ export function SiteHeader() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild><Link to="/profile"><UserIcon className="mr-2 h-4 w-4" />My profile</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/post-job"><PlusCircle className="mr-2 h-4 w-4" />Post a job</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href={SUBSCRIPTION_URL} target="_blank" rel="noopener noreferrer"><Crown className="mr-2 h-4 w-4 text-amber-500" />Subscription</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href={`https://wa.me/?text=${encodeURIComponent(`${SUBSCRIPTION_MESSAGE} ${SUBSCRIPTION_URL}`)}`} target="_blank" rel="noopener noreferrer"><Share2 className="mr-2 h-4 w-4" />Share subscription</a>
+                </DropdownMenuItem>
                 {isAdmin && (
                   <DropdownMenuItem asChild><Link to="/admin"><Shield className="mr-2 h-4 w-4" />Admin</Link></DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={signOut}><LogOut className="mr-2 h-4 w-4" />Sign out</DropdownMenuItem>
               </DropdownMenuContent>
+
             </DropdownMenu>
           ) : (
             <Button asChild size="sm" className="gradient-primary text-primary-foreground shadow-soft">

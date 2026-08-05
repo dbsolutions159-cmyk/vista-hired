@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { timeAgo } from "@/lib/jobs";
 import { CompletionRing } from "@/components/CompletionRing";
 import { computeCompletion } from "@/lib/profile-completion";
+import { ShareSubscriptionButton, SubscriptionButton } from "@/components/SubscriptionButtons";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -87,8 +88,13 @@ function ProfilePage() {
             </div>
             <Button asChild size="sm" variant="outline" className="shrink-0"><Link to="/profile/edit"><Pencil className="mr-1.5 h-3.5 w-3.5" />Edit</Link></Button>
           </div>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <SubscriptionButton />
+            <ShareSubscriptionButton />
+          </div>
         </div>
       </Card>
+
 
       {/* Dashboard grid */}
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
