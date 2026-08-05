@@ -62,12 +62,15 @@ export function SiteHeader() {
           <Button asChild size="sm" variant="outline" className="hidden sm:inline-flex border-primary/40 text-primary hover:bg-primary/10">
             <Link to="/post-job"><PlusCircle className="mr-1.5 h-4 w-4" />Post a Job</Link>
           </Button>
+          <SubscriptionButton className="hidden sm:inline-flex" />
+          <SubscriptionButton size="icon" iconOnly className="sm:hidden" />
           {isAdmin && (
             <Button asChild size="sm" variant="outline" className="hidden sm:inline-flex border-primary/40 text-primary hover:bg-primary/10">
               <Link to="/admin"><Shield className="mr-1.5 h-4 w-4" />Admin</Link>
             </Button>
           )}
           <NotificationBell />
+
           <Button variant="ghost" size="icon" onClick={toggleDark} aria-label="Toggle theme">
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
