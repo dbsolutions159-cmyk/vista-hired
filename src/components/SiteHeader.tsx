@@ -1,5 +1,5 @@
 import { Link, useRouter } from "@tanstack/react-router";
-import { Briefcase, LogOut, Moon, PlusCircle, Shield, Sun, User as UserIcon } from "lucide-react";
+import { Briefcase, Crown, LogOut, Moon, PlusCircle, Share2, Shield, Sun, User as UserIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
