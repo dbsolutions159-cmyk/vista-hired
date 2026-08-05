@@ -91,12 +91,19 @@ export function SiteHeader() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild><Link to="/profile"><UserIcon className="mr-2 h-4 w-4" />My profile</Link></DropdownMenuItem>
                 <DropdownMenuItem asChild><Link to="/post-job"><PlusCircle className="mr-2 h-4 w-4" />Post a job</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href={SUBSCRIPTION_URL} target="_blank" rel="noopener noreferrer"><Crown className="mr-2 h-4 w-4 text-amber-500" />Subscription</a>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <a href={`https://wa.me/?text=${encodeURIComponent(`${SUBSCRIPTION_MESSAGE} ${SUBSCRIPTION_URL}`)}`} target="_blank" rel="noopener noreferrer"><Share2 className="mr-2 h-4 w-4" />Share subscription</a>
+                </DropdownMenuItem>
                 {isAdmin && (
                   <DropdownMenuItem asChild><Link to="/admin"><Shield className="mr-2 h-4 w-4" />Admin</Link></DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={signOut}><LogOut className="mr-2 h-4 w-4" />Sign out</DropdownMenuItem>
               </DropdownMenuContent>
+
             </DropdownMenu>
           ) : (
             <Button asChild size="sm" className="gradient-primary text-primary-foreground shadow-soft">
