@@ -30,8 +30,3 @@ function HiringLayout() {
     </div>
   );
 }
-
-      <Outlet />
-    </div>
-  );
-}
