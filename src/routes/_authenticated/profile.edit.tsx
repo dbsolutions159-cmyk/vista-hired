@@ -435,7 +435,7 @@ function RecordsSection({
     if (!userId || !draft) return;
     setBusy(true);
     const { id, created_at, user_id, ...rest } = draft;
-    const payload = { ...rest, user_id: userId };
+    const payload = { ...rest, user_id: userId } as any;
     const res = id
       ? await supabase.from(table).update(payload).eq("id", id)
       : await supabase.from(table).insert(payload);
