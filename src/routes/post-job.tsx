@@ -195,6 +195,18 @@ function PostJob() {
         .single();
       if (error) throw error;
 
+      // Recruiter contact details are stored privately, never on the public job row.
+      if (form.hr_name.trim() || form.hr_email.trim() || form.hr_phone.trim()) {
+        await supabase.from("job_contacts").insert({
+          job_id: data.id,
+          hr_name: form.hr_name.trim() || null,
+          hr_email: form.hr_email.trim() || null,
+          hr_phone: form.hr_phone.trim() || null,
+        });
+      }
+
+
+
       await supabase.from("notifications").insert({
         user_id: user.id,
         type: isAdmin ? "job_live" : "job_submitted",
