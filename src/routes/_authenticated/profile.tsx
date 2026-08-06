@@ -107,7 +107,9 @@ function ProfilePage() {
                 {profile?.city && <p className="truncate text-xs text-muted-foreground mt-0.5">📍 {profile.city}</p>}
               </div>
             </div>
-            <Button asChild size="sm" variant="outline" className="shrink-0"><Link to="/profile/edit"><Pencil className="mr-1.5 h-3.5 w-3.5" />Edit</Link></Button>
+            <Button asChild size="sm" variant="outline" className="shrink-0">
+              <Link to="/profile/edit"><Pencil className="mr-1.5 h-3.5 w-3.5" />{pct === 100 ? "Edit profile" : "Complete profile"}</Link>
+            </Button>
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <SubscriptionButton />
