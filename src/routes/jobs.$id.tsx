@@ -1,10 +1,9 @@
 import { createFileRoute, Link, useParams, notFound } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { ArrowLeft, Building2, MapPin, Briefcase, Send } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, Briefcase } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { employmentTypeLabels, formatSalary, timeAgo, workTypeLabels } from "@/lib/jobs";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import ogFallback from "@/assets/hiresetu-og.jpg.asset.json";
 import { ApplyNowButton, PremiumMembershipButton } from "@/components/JobCta";

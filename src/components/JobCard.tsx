@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Building2, Heart, MapPin, MessageCircle, Send, Share2, Briefcase, BadgeCheck, Bookmark, Star, Zap, Home, UserRound } from "lucide-react";
+import { Building2, Heart, MapPin, MessageCircle, Share2, Briefcase, BadgeCheck, Bookmark, Star, Zap, Home, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
