@@ -162,6 +162,7 @@ export type Database = {
           id: string
           institution: string
           start_year: string | null
+          university: string | null
           user_id: string
         }
         Insert: {
@@ -173,6 +174,7 @@ export type Database = {
           id?: string
           institution: string
           start_year?: string | null
+          university?: string | null
           user_id: string
         }
         Update: {
@@ -184,6 +186,7 @@ export type Database = {
           id?: string
           institution?: string
           start_year?: string | null
+          university?: string | null
           user_id?: string
         }
         Relationships: []
@@ -589,6 +592,8 @@ export type Database = {
           city: string | null
           created_at: string
           current_company: string | null
+          current_job_title: string | null
+          current_salary: string | null
           date_of_birth: string | null
           education: string | null
           email: string | null
@@ -600,21 +605,28 @@ export type Database = {
           gender: string | null
           headline: string | null
           id: string
+          is_fresher: boolean | null
           languages: string[] | null
           linkedin_url: string | null
+          notice_period: string | null
           phone: string | null
           portfolio_url: string | null
           preferred_location: string | null
+          preferred_role: string | null
           resume_name: string | null
           resume_path: string | null
           skills: string[] | null
+          state: string | null
           updated_at: string
+          work_mode: string | null
         }
         Insert: {
           avatar_url?: string | null
           city?: string | null
           created_at?: string
           current_company?: string | null
+          current_job_title?: string | null
+          current_salary?: string | null
           date_of_birth?: string | null
           education?: string | null
           email?: string | null
@@ -626,21 +638,28 @@ export type Database = {
           gender?: string | null
           headline?: string | null
           id: string
+          is_fresher?: boolean | null
           languages?: string[] | null
           linkedin_url?: string | null
+          notice_period?: string | null
           phone?: string | null
           portfolio_url?: string | null
           preferred_location?: string | null
+          preferred_role?: string | null
           resume_name?: string | null
           resume_path?: string | null
           skills?: string[] | null
+          state?: string | null
           updated_at?: string
+          work_mode?: string | null
         }
         Update: {
           avatar_url?: string | null
           city?: string | null
           created_at?: string
           current_company?: string | null
+          current_job_title?: string | null
+          current_salary?: string | null
           date_of_birth?: string | null
           education?: string | null
           email?: string | null
@@ -652,15 +671,20 @@ export type Database = {
           gender?: string | null
           headline?: string | null
           id?: string
+          is_fresher?: boolean | null
           languages?: string[] | null
           linkedin_url?: string | null
+          notice_period?: string | null
           phone?: string | null
           portfolio_url?: string | null
           preferred_location?: string | null
+          preferred_role?: string | null
           resume_name?: string | null
           resume_path?: string | null
           skills?: string[] | null
+          state?: string | null
           updated_at?: string
+          work_mode?: string | null
         }
         Relationships: []
       }
