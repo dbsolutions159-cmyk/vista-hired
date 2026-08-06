@@ -163,9 +163,6 @@ function PostJob() {
         company_website: form.company_website.trim() || null,
         cover_image_url: form.cover_image_url || null,
         video_url: form.video_url || null,
-        hr_name: form.hr_name.trim() || null,
-        hr_email: form.hr_email.trim() || null,
-        hr_phone: form.hr_phone.trim() || null,
         category: form.category.trim() || null,
         department: form.department.trim() || null,
         description: form.description.trim(),
@@ -197,6 +194,18 @@ function PostJob() {
         .select("id")
         .single();
       if (error) throw error;
+
+      // Recruiter contact details are stored privately, never on the public job row.
+      if (form.hr_name.trim() || form.hr_email.trim() || form.hr_phone.trim()) {
+        await supabase.from("job_contacts").insert({
+          job_id: data.id,
+          hr_name: form.hr_name.trim() || null,
+          hr_email: form.hr_email.trim() || null,
+          hr_phone: form.hr_phone.trim() || null,
+        });
+      }
+
+
 
       await supabase.from("notifications").insert({
         user_id: user.id,

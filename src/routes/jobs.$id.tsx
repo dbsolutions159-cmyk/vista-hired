@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import ogFallback from "@/assets/hiresetu-og.jpg.asset.json";
 import { ApplyNowButton, PremiumMembershipButton } from "@/components/JobCta";
+import { incrementJobView } from "@/lib/jobs.functions";
+
 
 
 const SITE_URL = "https://hiresetu-ai.lovable.app";
@@ -122,8 +124,9 @@ function JobDetail() {
   const { job } = Route.useLoaderData();
 
   useEffect(() => {
-    if (id) supabase.rpc("increment_job_view", { _job_id: id });
+    if (id) void incrementJobView({ data: { jobId: id } }).catch(() => {});
   }, [id]);
+
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">

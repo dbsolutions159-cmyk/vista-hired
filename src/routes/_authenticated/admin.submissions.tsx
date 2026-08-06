@@ -33,7 +33,8 @@ function Submissions() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("jobs")
-        .select("*")
+        .select("*, job_contacts(hr_name, hr_email, hr_phone)")
+
         .neq("poster_role", "admin")
         .eq("status", status as any)
         .order("created_at", { ascending: false });
@@ -100,10 +101,14 @@ function Submissions() {
                 </div>
                 <div className="font-display text-lg font-semibold">{j.title}</div>
                 <div className="mt-0.5 text-xs text-muted-foreground">{j.location} · {j.experience}</div>
-                <div className="mt-1 text-xs">
-                  <span className="text-muted-foreground">HR:</span> {j.hr_name} · <a href={`mailto:${j.hr_email}`} className="text-primary underline">{j.hr_email}</a>
-                  {j.hr_phone && <> · {j.hr_phone}</>}
-                </div>
+                {j.job_contacts && (
+                  <div className="mt-1 text-xs">
+                    <span className="text-muted-foreground">HR:</span> {j.job_contacts.hr_name}
+                    {j.job_contacts.hr_email && <> · <a href={`mailto:${j.job_contacts.hr_email}`} className="text-primary underline">{j.job_contacts.hr_email}</a></>}
+                    {j.job_contacts.hr_phone && <> · {j.job_contacts.hr_phone}</>}
+                  </div>
+                )}
+
                 <p className="mt-2 line-clamp-3 text-sm text-muted-foreground">{j.description}</p>
                 {j.rejection_reason && <div className="mt-2 rounded bg-rose-500/10 p-2 text-xs text-rose-600">Reason: {j.rejection_reason}</div>}
               </div>

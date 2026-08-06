@@ -366,6 +366,41 @@ export type Database = {
           },
         ]
       }
+      job_contacts: {
+        Row: {
+          created_at: string
+          hr_email: string | null
+          hr_name: string | null
+          hr_phone: string | null
+          job_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hr_email?: string | null
+          hr_name?: string | null
+          hr_phone?: string | null
+          job_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hr_email?: string | null
+          hr_name?: string | null
+          hr_phone?: string | null
+          job_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_contacts_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: true
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       jobs: {
         Row: {
           apply_url: string | null
@@ -383,9 +418,6 @@ export type Database = {
           employment_type: Database["public"]["Enums"]["employment_type"]
           experience: string | null
           featured: boolean
-          hr_email: string | null
-          hr_name: string | null
-          hr_phone: string | null
           id: string
           location: string
           openings: number | null
@@ -425,9 +457,6 @@ export type Database = {
           employment_type?: Database["public"]["Enums"]["employment_type"]
           experience?: string | null
           featured?: boolean
-          hr_email?: string | null
-          hr_name?: string | null
-          hr_phone?: string | null
           id?: string
           location: string
           openings?: number | null
@@ -467,9 +496,6 @@ export type Database = {
           employment_type?: Database["public"]["Enums"]["employment_type"]
           experience?: string | null
           featured?: boolean
-          hr_email?: string | null
-          hr_name?: string | null
-          hr_phone?: string | null
           id?: string
           location?: string
           openings?: number | null
