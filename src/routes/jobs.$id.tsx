@@ -122,8 +122,9 @@ function JobDetail() {
   const { job } = Route.useLoaderData();
 
   useEffect(() => {
-    if (id) supabase.rpc("increment_job_view", { _job_id: id });
+    if (id) void incrementJobView({ data: { jobId: id } }).catch(() => {});
   }, [id]);
+
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
