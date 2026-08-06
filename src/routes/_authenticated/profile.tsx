@@ -123,6 +123,7 @@ function ProfilePage() {
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
         <Card className="p-4 sm:col-span-1 flex flex-col items-center justify-center">
           <CompletionRing pct={pct} size={110} />
+          <div className="mt-1 text-center text-sm font-medium">Your profile is {pct}% complete</div>
           {pct < 100 && <Button asChild size="sm" variant="link" className="mt-1"><Link to="/profile/edit">Complete now →</Link></Button>}
           {pct === 100 && (
             <div className="mt-2 flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
