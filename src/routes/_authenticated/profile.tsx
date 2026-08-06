@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { timeAgo } from "@/lib/jobs";
 import { CompletionRing } from "@/components/CompletionRing";
-import { computeCompletion } from "@/lib/profile-completion";
+import { computeCompletionDetail } from "@/lib/profile-completion";
 import { ShareSubscriptionButton, SubscriptionButton } from "@/components/SubscriptionButtons";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -53,8 +53,29 @@ function ProfilePage() {
     },
   });
 
+  const eduQ = useQuery({
+    enabled: !!user,
+    queryKey: ["candidate-education", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("candidate_education").select("*").eq("user_id", user!.id).order("created_at");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const expQ = useQuery({
+    enabled: !!user,
+    queryKey: ["candidate-experience", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("candidate_experience").select("*").eq("user_id", user!.id).order("created_at");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
   const profile = profileQ.data as any;
-  const pct = computeCompletion(profile);
+  const detail = computeCompletionDetail(profile, eduQ.data ?? [], expQ.data ?? []);
+  const pct = detail.pct;
 
   useEffect(() => {
     (async () => {
@@ -86,7 +107,9 @@ function ProfilePage() {
                 {profile?.city && <p className="truncate text-xs text-muted-foreground mt-0.5">📍 {profile.city}</p>}
               </div>
             </div>
-            <Button asChild size="sm" variant="outline" className="shrink-0"><Link to="/profile/edit"><Pencil className="mr-1.5 h-3.5 w-3.5" />Edit</Link></Button>
+            <Button asChild size="sm" variant="outline" className="shrink-0">
+              <Link to="/profile/edit"><Pencil className="mr-1.5 h-3.5 w-3.5" />{pct === 100 ? "Edit profile" : "Complete profile"}</Link>
+            </Button>
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <SubscriptionButton />
@@ -100,6 +123,7 @@ function ProfilePage() {
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
         <Card className="p-4 sm:col-span-1 flex flex-col items-center justify-center">
           <CompletionRing pct={pct} size={110} />
+          <div className="mt-1 text-center text-sm font-medium">Your profile is {pct}% complete</div>
           {pct < 100 && <Button asChild size="sm" variant="link" className="mt-1"><Link to="/profile/edit">Complete now →</Link></Button>}
           {pct === 100 && (
             <div className="mt-2 flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
@@ -118,6 +142,17 @@ function ProfilePage() {
           <div className="text-xs text-muted-foreground">Bookmarked</div>
         </Card>
       </div>
+
+      {detail.suggestions.length > 0 && (
+        <Card className="mt-3 p-4">
+          <div className="text-sm font-semibold">Recommended next steps</div>
+          <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+            {detail.suggestions.map((s) => <li key={s}>• {s}</li>)}
+          </ul>
+        </Card>
+      )}
+
+
 
       <Tabs defaultValue="applications" className="mt-6">
         <TabsList>
