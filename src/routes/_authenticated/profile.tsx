@@ -53,8 +53,29 @@ function ProfilePage() {
     },
   });
 
+  const eduQ = useQuery({
+    enabled: !!user,
+    queryKey: ["candidate-education", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("candidate_education").select("*").eq("user_id", user!.id).order("created_at");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const expQ = useQuery({
+    enabled: !!user,
+    queryKey: ["candidate-experience", user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("candidate_experience").select("*").eq("user_id", user!.id).order("created_at");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
   const profile = profileQ.data as any;
-  const pct = computeCompletion(profile);
+  const detail = computeCompletionDetail(profile, eduQ.data ?? [], expQ.data ?? []);
+  const pct = detail.pct;
 
   useEffect(() => {
     (async () => {
