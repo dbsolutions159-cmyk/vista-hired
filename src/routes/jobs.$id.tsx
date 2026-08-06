@@ -1,12 +1,13 @@
 import { createFileRoute, Link, useParams, notFound } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { ArrowLeft, Building2, MapPin, Briefcase, Send } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, Briefcase } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { employmentTypeLabels, formatSalary, timeAgo, workTypeLabels } from "@/lib/jobs";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import ogFallback from "@/assets/hiresetu-og.jpg.asset.json";
+import { ApplyNowButton, PremiumMembershipButton } from "@/components/JobCta";
+
 
 const SITE_URL = "https://hiresetu-ai.lovable.app";
 
@@ -180,16 +181,28 @@ function JobDetail() {
           </div>
         )}
 
-        <div className="mt-8 flex justify-end">
-          <Button asChild size="lg" className="gradient-primary text-primary-foreground shadow-soft">
-            <Link to="/apply/$id" params={{ id: job.id }}><Send className="mr-2 h-4 w-4" />Apply now</Link>
-          </Button>
+        <div className="mt-8 rounded-xl border bg-muted/30 p-4">
+          <div className="mb-3 text-sm font-semibold">Ready to take the next step?</div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <ApplyNowButton jobId={job.id} size="lg" source="job_detail" fullWidth />
+            <PremiumMembershipButton jobId={job.id} size="lg" source="job_detail" fullWidth />
+          </div>
         </div>
         </div>
       </Card>
+
+      {/* Sticky mobile CTA */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 sm:hidden">
+        <div className="pointer-events-auto flex gap-2 border-t bg-background/95 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur">
+          <ApplyNowButton jobId={job.id} size="lg" source="job_detail_sticky" fullWidth className="flex-1" />
+          <PremiumMembershipButton jobId={job.id} size="lg" source="job_detail_sticky" fullWidth label="Premium" className="flex-1" />
+        </div>
+      </div>
+      <div className="h-24 sm:hidden" />
     </div>
   );
 }
+
 
 function Section({ title, body }: { title: string; body: string }) {
   return (

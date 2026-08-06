@@ -7,6 +7,8 @@ import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import type { ExternalJob } from "@/lib/external-jobs.functions";
+import { PremiumMembershipButton, trackCtaClick } from "@/components/JobCta";
+
 
 const empLabels: Record<ExternalJob["employment_type"], string> = {
   full_time: "Full-time",
@@ -111,13 +113,20 @@ export function ExternalJobCard({ job }: { job: ExternalJob }) {
         </div>
       </div>
 
-      <div className="flex items-center justify-end border-t bg-muted/30 px-3 py-2">
-        <Button asChild size="sm" className="gradient-primary text-primary-foreground shadow-soft">
+      <div className="flex items-center justify-end gap-1.5 border-t bg-muted/30 px-3 py-2">
+        <PremiumMembershipButton source="external_job_card" label="Premium" />
+        <Button
+          asChild
+          size="sm"
+          className="gradient-primary text-primary-foreground shadow-soft"
+          onClick={() => trackCtaClick({ cta: "apply_now", externalJobId: externalId, userId: user?.id, source: "external_job_card" })}
+        >
           <a href={job.url} target="_blank" rel="noopener noreferrer">
             Apply Now <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
           </a>
         </Button>
       </div>
+
     </Card>
   );
 }

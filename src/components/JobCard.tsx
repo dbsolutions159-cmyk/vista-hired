@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Building2, Heart, MapPin, MessageCircle, Send, Share2, Briefcase, BadgeCheck, Bookmark, Star, Zap, Home, UserRound } from "lucide-react";
+import { Building2, Heart, MapPin, MessageCircle, Share2, Briefcase, BadgeCheck, Bookmark, Star, Zap, Home, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { employmentTypeLabels, formatSalary, timeAgo, workTypeLabels, type Job } from "@/lib/jobs";
 import { CommentsSheet } from "@/components/CommentsSheet";
+import { ApplyNowButton, PremiumMembershipButton } from "@/components/JobCta";
+
 
 export function JobCard({ job }: { job: Job }) {
   const { user } = useAuth();
@@ -132,11 +134,11 @@ export function JobCard({ job }: { job: Job }) {
             <span className="hidden sm:inline">Share</span>
           </Button>
         </div>
-        <Button size="sm" asChild className="gradient-primary text-primary-foreground shadow-soft">
-          <Link to="/apply/$id" params={{ id: job.id }}>
-            <Send className="mr-1.5 h-3.5 w-3.5" />Apply
-          </Link>
-        </Button>
+        <div className="flex items-center gap-1.5">
+          <PremiumMembershipButton jobId={job.id} source="job_card" label="Premium" />
+          <ApplyNowButton jobId={job.id} source="job_card" />
+        </div>
+
       </div>
 
       <CommentsSheet jobId={job.id} open={openComments} onOpenChange={setOpenComments} onCountChange={setCommentCount} />

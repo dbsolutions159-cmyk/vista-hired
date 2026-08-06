@@ -259,6 +259,44 @@ export type Database = {
           },
         ]
       }
+      cta_clicks: {
+        Row: {
+          created_at: string
+          cta: string
+          external_job_id: string | null
+          id: string
+          job_id: string | null
+          source: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          cta: string
+          external_job_id?: string | null
+          id?: string
+          job_id?: string | null
+          source?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          cta?: string
+          external_job_id?: string | null
+          id?: string
+          job_id?: string | null
+          source?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cta_clicks_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       interviews: {
         Row: {
           application_id: string
