@@ -4,9 +4,12 @@ export type ProfileLike = {
   phone?: string | null;
   avatar_url?: string | null;
   city?: string | null;
+  state?: string | null;
   date_of_birth?: string | null;
   gender?: string | null;
   preferred_location?: string | null;
+  preferred_role?: string | null;
+  work_mode?: string | null;
   education?: string | null;
   skills?: string[] | null;
   experience_years?: string | null;
@@ -14,24 +17,101 @@ export type ProfileLike = {
   expected_salary?: string | null;
   employment_pref?: string | null;
   resume_path?: string | null;
+  experience_summary?: string | null;
+  is_fresher?: boolean | null;
+  current_job_title?: string | null;
+  current_company?: string | null;
+  notice_period?: string | null;
 };
 
-// 15 weighted fields; each worth ~6.66% → rounded.
-const FIELDS: (keyof ProfileLike)[] = [
-  "full_name", "email", "phone", "avatar_url", "city",
-  "date_of_birth", "gender", "preferred_location", "education",
-  "skills", "experience_years", "languages", "expected_salary",
-  "employment_pref", "resume_path",
-];
+const has = (v: unknown) =>
+  Array.isArray(v) ? v.length > 0 : v != null && String(v).trim() !== "";
 
-export function computeCompletion(p: ProfileLike | null | undefined): number {
-  if (!p) return 0;
-  let filled = 0;
-  for (const f of FIELDS) {
-    const v = p[f] as any;
-    if (Array.isArray(v) ? v.length > 0 : v != null && String(v).trim() !== "") filled++;
-  }
-  return Math.round((filled / FIELDS.length) * 100);
+export type CompletionSection = {
+  key: string;
+  label: string;
+  weight: number;
+  done: boolean;
+  hint: string;
+};
+
+export type CompletionResult = {
+  pct: number;
+  sections: CompletionSection[];
+  missing: CompletionSection[];
+  suggestions: string[];
+};
+
+export function computeCompletionDetail(
+  p: ProfileLike | null | undefined,
+  education: unknown[] = [],
+  experience: unknown[] = [],
+): CompletionResult {
+  const prof = p ?? {};
+  const basicFields = [
+    prof.full_name,
+    prof.phone,
+    prof.email,
+    prof.date_of_birth,
+    prof.gender,
+    prof.city,
+    prof.state,
+  ];
+  const basicDone = basicFields.filter(has).length;
+
+  const isFresher = prof.is_fresher === true;
+  const professionalDone = isFresher
+    ? has(prof.expected_salary)
+    : [prof.current_job_title, prof.current_company, prof.experience_years, prof.expected_salary, prof.notice_period].every(has);
+
+  const prefsDone = [prof.preferred_role, prof.preferred_location, prof.employment_pref, prof.work_mode].every(has);
+
+  const sections: CompletionSection[] = [
+    {
+      key: "basic",
+      label: "Basic details",
+      weight: 20,
+      done: basicDone === basicFields.length,
+      hint: "Complete your basic details",
+    },
+    { key: "resume", label: "Resume", weight: 20, done: has(prof.resume_path), hint: "Upload your resume" },
+    {
+      key: "education",
+      label: "Education",
+      weight: 15,
+      done: education.length > 0,
+      hint: "Add your education",
+    },
+    {
+      key: "professional",
+      label: "Professional details",
+      weight: 15,
+      done: prof.is_fresher != null && professionalDone && (isFresher || experience.length > 0),
+      hint: isFresher ? "Complete your professional details" : "Add your work experience and professional details",
+    },
+    { key: "skills", label: "Skills", weight: 10, done: has(prof.skills), hint: "Add skills to improve your profile" },
+    { key: "preferences", label: "Job preferences", weight: 10, done: prefsDone, hint: "Set your job preferences" },
+    { key: "about", label: "About", weight: 5, done: has(prof.experience_summary), hint: "Write a short About Me" },
+    { key: "photo", label: "Profile photo", weight: 5, done: has(prof.avatar_url), hint: "Add a profile photo" },
+  ];
+
+  const pct = sections.reduce((s, x) => s + (x.done ? x.weight : 0), 0);
+  const missing = sections.filter((s) => !s.done);
+  const suggestions = missing
+    .slice()
+    .sort((a, b) => b.weight - a.weight)
+    .slice(0, 3)
+    .map((s) => `${s.hint} to reach ${Math.min(100, pct + s.weight)}%.`);
+
+  return { pct, sections, missing, suggestions };
+}
+
+export function computeCompletion(
+  p: ProfileLike | null | undefined,
+  education: unknown[] = [],
+  experience: unknown[] = [],
+): number {
+  return computeCompletionDetail(p, education, experience).pct;
 }
 
 export function completionTier(pct: number) {
