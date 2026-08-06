@@ -143,6 +143,17 @@ function ProfilePage() {
         </Card>
       </div>
 
+      {detail.suggestions.length > 0 && (
+        <Card className="mt-3 p-4">
+          <div className="text-sm font-semibold">Recommended next steps</div>
+          <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
+            {detail.suggestions.map((s) => <li key={s}>• {s}</li>)}
+          </ul>
+        </Card>
+      )}
+
+
+
       <Tabs defaultValue="applications" className="mt-6">
         <TabsList>
           <TabsTrigger value="applications"><FileText className="mr-1.5 h-4 w-4" />Applied</TabsTrigger>
