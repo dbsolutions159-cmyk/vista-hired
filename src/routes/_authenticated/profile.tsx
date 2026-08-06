@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { timeAgo } from "@/lib/jobs";
 import { CompletionRing } from "@/components/CompletionRing";
-import { computeCompletion } from "@/lib/profile-completion";
+import { computeCompletionDetail } from "@/lib/profile-completion";
 import { ShareSubscriptionButton, SubscriptionButton } from "@/components/SubscriptionButtons";
 
 export const Route = createFileRoute("/_authenticated/profile")({
