@@ -29,6 +29,7 @@ import { Route as AuthenticatedApplyIdRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAdminSubmissionsRouteImport } from './routes/_authenticated/admin.submissions'
 import { Route as AuthenticatedAdminJobsRouteImport } from './routes/_authenticated/admin.jobs'
 import { Route as AuthenticatedAdminApplicationsRouteImport } from './routes/_authenticated/admin.applications'
+import { Route as ApiPublicHooksSyncJobsRouteImport } from './routes/api/public/hooks/sync-jobs'
 import { Route as AuthenticatedHiringCandidatesAppIdRouteImport } from './routes/_authenticated/hiring.candidates.$appId'
 import { Route as AuthenticatedAdminApplicationsIdRouteImport } from './routes/_authenticated/admin.applications.$id'
 
@@ -138,6 +139,11 @@ const AuthenticatedAdminApplicationsRoute =
     path: '/applications',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const ApiPublicHooksSyncJobsRoute = ApiPublicHooksSyncJobsRouteImport.update({
+  id: '/api/public/hooks/sync-jobs',
+  path: '/api/public/hooks/sync-jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedHiringCandidatesAppIdRoute =
   AuthenticatedHiringCandidatesAppIdRouteImport.update({
     id: '/candidates/$appId',
@@ -173,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/profile/': typeof AuthenticatedProfileIndexRoute
   '/admin/applications/$id': typeof AuthenticatedAdminApplicationsIdRoute
   '/hiring/candidates/$appId': typeof AuthenticatedHiringCandidatesAppIdRoute
+  '/api/public/hooks/sync-jobs': typeof ApiPublicHooksSyncJobsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileIndexRoute
   '/admin/applications/$id': typeof AuthenticatedAdminApplicationsIdRoute
   '/hiring/candidates/$appId': typeof AuthenticatedHiringCandidatesAppIdRoute
+  '/api/public/hooks/sync-jobs': typeof ApiPublicHooksSyncJobsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -218,6 +226,7 @@ export interface FileRoutesById {
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
   '/_authenticated/admin/applications/$id': typeof AuthenticatedAdminApplicationsIdRoute
   '/_authenticated/hiring/candidates/$appId': typeof AuthenticatedHiringCandidatesAppIdRoute
+  '/api/public/hooks/sync-jobs': typeof ApiPublicHooksSyncJobsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -243,6 +252,7 @@ export interface FileRouteTypes {
     | '/profile/'
     | '/admin/applications/$id'
     | '/hiring/candidates/$appId'
+    | '/api/public/hooks/sync-jobs'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -263,6 +273,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/admin/applications/$id'
     | '/hiring/candidates/$appId'
+    | '/api/public/hooks/sync-jobs'
   id:
     | '__root__'
     | '/'
@@ -287,6 +298,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile/'
     | '/_authenticated/admin/applications/$id'
     | '/_authenticated/hiring/candidates/$appId'
+    | '/api/public/hooks/sync-jobs'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -296,6 +308,7 @@ export interface RootRouteChildren {
   PostJobRoute: typeof PostJobRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   JobsIdRoute: typeof JobsIdRoute
+  ApiPublicHooksSyncJobsRoute: typeof ApiPublicHooksSyncJobsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -440,6 +453,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminApplicationsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/api/public/hooks/sync-jobs': {
+      id: '/api/public/hooks/sync-jobs'
+      path: '/api/public/hooks/sync-jobs'
+      fullPath: '/api/public/hooks/sync-jobs'
+      preLoaderRoute: typeof ApiPublicHooksSyncJobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/hiring/candidates/$appId': {
       id: '/_authenticated/hiring/candidates/$appId'
       path: '/candidates/$appId'
@@ -547,17 +567,8 @@ const rootRouteChildren: RootRouteChildren = {
   PostJobRoute: PostJobRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   JobsIdRoute: JobsIdRoute,
+  ApiPublicHooksSyncJobsRoute: ApiPublicHooksSyncJobsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
