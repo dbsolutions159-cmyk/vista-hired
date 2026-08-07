@@ -1,87 +1,138 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Search, Sparkles, SearchX } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ExternalJobCard } from "@/components/ExternalJobCard";
+import { ImportedJobCard, type ImportedJob } from "@/components/ImportedJobCard";
 import { JobCard } from "@/components/JobCard";
 import { LocationPicker } from "@/components/LocationPicker";
-import { fetchExternalJobs, type ExternalJob } from "@/lib/external-jobs.functions";
 import { supabase } from "@/integrations/supabase/client";
 import type { Job } from "@/lib/jobs";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
+  head: () => ({
+    meta: [
+      { title: "HireSetu — Verified India Jobs from Official Company Career Pages" },
+      {
+        name: "description",
+        content:
+          "Discover verified jobs across India — Bengaluru, Hyderabad, Pune, Delhi NCR and Remote India — imported from official company career pages. Apply directly, no aggregators.",
+      },
+      { property: "og:title", content: "HireSetu — Verified India Jobs" },
+      { property: "og:description", content: "Verified India-first jobs from official company career pages. Apply directly on the employer's site." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
 });
 
-type FilterKey = "all" | "remote" | "wfh" | "full_time" | "part_time" | "internship" | "freshers" | "experienced";
+const PAGE_SIZE = 20;
+
+type FilterKey =
+  | "all" | "verified" | "remote" | "hybrid" | "wfh" | "freshers" | "experienced"
+  | "internship" | "part_time" | "full_time"
+  | "IT" | "BPO" | "HR" | "Sales" | "Marketing" | "Engineering" | "Finance" | "Healthcare";
 
 const FILTERS: { key: FilterKey; label: string }[] = [
-  { key: "all", label: "All Jobs" },
-  { key: "remote", label: "Remote" },
+  { key: "all", label: "Latest" },
+  { key: "verified", label: "Verified" },
+  { key: "remote", label: "Remote India" },
+  { key: "hybrid", label: "Hybrid" },
   { key: "wfh", label: "Work From Home" },
-  { key: "full_time", label: "Full Time" },
-  { key: "part_time", label: "Part Time" },
-  { key: "internship", label: "Internship" },
   { key: "freshers", label: "Freshers" },
   { key: "experienced", label: "Experienced" },
+  { key: "internship", label: "Internship" },
+  { key: "part_time", label: "Part Time" },
+  { key: "full_time", label: "Full Time" },
+  { key: "IT", label: "IT" },
+  { key: "BPO", label: "BPO" },
+  { key: "HR", label: "HR" },
+  { key: "Sales", label: "Sales" },
+  { key: "Marketing", label: "Marketing" },
+  { key: "Engineering", label: "Engineering" },
+  { key: "Finance", label: "Finance" },
+  { key: "Healthcare", label: "Healthcare" },
 ];
 
-const FRESHER_RX = /\b(fresher|entry[- ]level|graduate|trainee|0[-–]?1\s*(yr|year)|no experience)\b/i;
-const EXP_RX = /\b(senior|sr\.?|lead|principal|staff|manager|architect|[3-9]\+?\s*(yrs?|years?)|10\+\s*years?)\b/i;
+const CATEGORY_FILTERS = new Set(["IT", "BPO", "HR", "Sales", "Marketing", "Engineering", "Finance", "Healthcare"]);
 
-function matches(job: ExternalJob, filter: FilterKey, query: string): boolean {
-  if (filter !== "all") {
-    if (filter === "remote" && !job.remote) return false;
-    if (filter === "wfh" && !(job.remote || /work from home|wfh/i.test(job.location + " " + job.description))) return false;
-    if (filter === "full_time" && job.employment_type !== "full_time") return false;
-    if (filter === "part_time" && job.employment_type !== "part_time") return false;
-    if (filter === "internship" && job.employment_type !== "internship") return false;
-    if (filter === "freshers" && !FRESHER_RX.test(job.title + " " + job.description)) return false;
-    if (filter === "experienced" && !EXP_RX.test(job.title + " " + job.description)) return false;
+function escapeLike(value: string) {
+  return value.replace(/[%,()]/g, " ").trim();
+}
+
+async function fetchImportedPage(params: { q: string; location: string; filter: FilterKey; page: number }) {
+  const from = params.page * PAGE_SIZE;
+  let query = supabase
+    .from("external_jobs")
+    .select("*")
+    .eq("is_active", true)
+    .order("published_at", { ascending: false })
+    .range(from, from + PAGE_SIZE - 1);
+
+  const f = params.filter;
+  if (f === "verified") query = query.eq("verified", true);
+  if (f === "remote") query = query.eq("remote_type", "remote");
+  if (f === "hybrid") query = query.eq("remote_type", "hybrid");
+  if (f === "wfh") query = query.in("remote_type", ["remote", "hybrid"]);
+  if (f === "freshers") query = query.eq("experience_level", "fresher");
+  if (f === "experienced") query = query.eq("experience_level", "experienced");
+  if (f === "internship" || f === "part_time" || f === "full_time") query = query.eq("employment_type", f);
+  if (CATEGORY_FILTERS.has(f)) query = query.eq("category", f);
+
+  const q = escapeLike(params.q);
+  if (q) {
+    query = query.or(
+      [
+        `title.ilike.%${q}%`,
+        `company_name.ilike.%${q}%`,
+        `category.ilike.%${q}%`,
+        `city.ilike.%${q}%`,
+        `state.ilike.%${q}%`,
+        `location_text.ilike.%${q}%`,
+        `summary.ilike.%${q}%`,
+      ].join(","),
+    );
   }
-  if (query) {
-    const q = query.toLowerCase();
-    const hay = `${job.title} ${job.company} ${job.location} ${job.tags.join(" ")} ${job.description}`.toLowerCase();
-    if (!hay.includes(q)) return false;
-  }
-  return true;
+  const loc = escapeLike(params.location);
+  if (loc) query = query.or(`city.ilike.%${loc}%,state.ilike.%${loc}%,location_text.ilike.%${loc}%`);
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data ?? []) as ImportedJob[];
 }
 
 function matchesInternal(job: Job, filter: FilterKey, committed: { q: string; location: string }): boolean {
-  const hayBase = `${job.title} ${job.company_name} ${job.description ?? ""} ${(job as any).skills?.join?.(" ") ?? ""}`;
-  const isRemote = job.work_type === "remote" || job.work_type === "hybrid";
-  if (filter !== "all") {
-    if (filter === "remote" && !isRemote) return false;
-    if (filter === "wfh" && !(isRemote || /work from home|wfh/i.test(job.location + " " + hayBase))) return false;
-    if (filter === "full_time" && job.employment_type !== "full_time") return false;
-    if (filter === "part_time" && job.employment_type !== "part_time") return false;
-    if (filter === "internship" && job.employment_type !== "internship") return false;
-    if (filter === "freshers" && !FRESHER_RX.test(hayBase)) return false;
-    if (filter === "experienced" && !EXP_RX.test(hayBase)) return false;
-  }
-  if (committed.q) {
-    const q = committed.q.toLowerCase();
-    if (!`${hayBase}`.toLowerCase().includes(q)) return false;
-  }
-  if (committed.location) {
-    if (!(job.location || "").toLowerCase().includes(committed.location.toLowerCase())) return false;
-  }
+  const hay = `${job.title} ${job.company_name} ${job.description ?? ""} ${(job as any).skills?.join?.(" ") ?? ""}`;
+  const isRemote = job.work_type === "remote";
+  const isHybrid = job.work_type === "hybrid";
+  if (filter === "remote" && !isRemote) return false;
+  if (filter === "hybrid" && !isHybrid) return false;
+  if (filter === "wfh" && !(isRemote || isHybrid)) return false;
+  if ((filter === "full_time" || filter === "part_time" || filter === "internship") && job.employment_type !== filter) return false;
+  if (filter === "freshers" && !/\b(fresher|entry[- ]level|graduate|trainee)\b/i.test(hay)) return false;
+  if (filter === "experienced" && !/\b(senior|lead|manager|\d\+?\s*years?)\b/i.test(hay)) return false;
+  if (CATEGORY_FILTERS.has(filter) && (job.category ?? "").toLowerCase() !== filter.toLowerCase()) return false;
+  if (committed.q && !hay.toLowerCase().includes(committed.q.toLowerCase())) return false;
+  if (committed.location && !(job.location || "").toLowerCase().includes(committed.location.toLowerCase())) return false;
   return true;
 }
 
 function HomePage() {
   const [q, setQ] = useState("");
   const [location, setLocation] = useState("");
-  const [committed, setCommitted] = useState<{ q: string; location: string }>({ q: "", location: "" });
+  const [committed, setCommitted] = useState({ q: "", location: "" });
   const [filter, setFilter] = useState<FilterKey>("all");
   const queryClient = useQueryClient();
+  const sentinel = useRef<HTMLDivElement | null>(null);
 
-  const { data, isLoading, isFetching } = useQuery({
-    queryKey: ["external-jobs", committed],
-    queryFn: () => fetchExternalJobs({ data: { q: committed.q || undefined, location: committed.location || undefined } }),
+  const imported = useInfiniteQuery({
+    queryKey: ["imported-jobs", committed, filter],
+    initialPageParam: 0,
+    queryFn: ({ pageParam }) => fetchImportedPage({ ...committed, filter, page: pageParam as number }),
+    getNextPageParam: (last, all) => (last.length === PAGE_SIZE ? all.length : undefined),
     staleTime: 60_000,
   });
 
@@ -100,7 +151,6 @@ function HomePage() {
     staleTime: 30_000,
   });
 
-  // Realtime: refresh when jobs are inserted/updated/deleted
   useEffect(() => {
     const channel = supabase
       .channel("jobs-home-feed")
@@ -113,16 +163,34 @@ function HomePage() {
     };
   }, [queryClient]);
 
+  // Infinite scroll
+  const { hasNextPage, isFetchingNextPage, fetchNextPage } = imported;
+  const observe = useCallback(
+    (node: HTMLDivElement | null) => {
+      sentinel.current = node;
+      if (!node) return;
+      const io = new IntersectionObserver((entries) => {
+        if (entries[0]?.isIntersecting && hasNextPage && !isFetchingNextPage) void fetchNextPage();
+      }, { rootMargin: "400px" });
+      io.observe(node);
+      return () => io.disconnect();
+    },
+    [hasNextPage, isFetchingNextPage, fetchNextPage],
+  );
+
   const submit = (e?: React.FormEvent) => {
     e?.preventDefault();
     setCommitted({ q: q.trim(), location: location.trim() });
   };
 
-  const filtered = useMemo(() => (data?.jobs ?? []).filter((j) => matches(j, filter, "")), [data, filter]);
+  const importedJobs = useMemo(() => imported.data?.pages.flat() ?? [], [imported.data]);
   const filteredInternal = useMemo(
     () => (internalJobs ?? []).filter((j) => matchesInternal(j, filter, committed)),
     [internalJobs, filter, committed],
   );
+
+  const loading = imported.isLoading && internalLoading;
+  const empty = !loading && !importedJobs.length && !filteredInternal.length;
 
   return (
     <>
@@ -131,13 +199,13 @@ function HomePage() {
           <div className="mx-auto max-w-3xl text-center">
             <div className="inline-flex items-center gap-1.5 rounded-full border bg-card/60 px-3 py-1 text-xs shadow-soft backdrop-blur">
               <Sparkles className="h-3.5 w-3.5 text-primary" />
-              <span>Live jobs from Adzuna & Remotive</span>
+              <span>Verified India jobs · official company career pages</span>
             </div>
             <h1 className="mt-4 font-display text-4xl font-bold leading-tight tracking-tight sm:text-6xl">
               Find your next role on <span className="text-gradient">HireSetu</span>
             </h1>
             <p className="mt-4 text-base text-muted-foreground sm:text-lg">
-              Real, active openings — search by title, company, location, or skills. Apply directly on the employer's site.
+              Real, active openings across India and Remote India — refreshed every 30 minutes. Apply directly on the employer's site.
             </p>
           </div>
 
@@ -146,7 +214,7 @@ function HomePage() {
               <div className="flex flex-col gap-2 md:flex-row">
                 <div className="relative flex-1">
                   <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Title, company, or skill (e.g. React, Marketing)" className="h-11 pl-9 bg-background/70" />
+                  <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Title, company, skill or category (e.g. React, BPO)" className="h-11 pl-9 bg-background/70" />
                 </div>
                 <LocationPicker value={location} onChange={setLocation} />
                 <Button type="submit" className="h-11 gradient-primary text-primary-foreground shadow-soft">Search</Button>
@@ -172,13 +240,11 @@ function HomePage() {
         <div className="mb-4 flex items-baseline justify-between">
           <h2 className="font-display text-xl font-semibold">Latest jobs</h2>
           <span className="text-xs text-muted-foreground">
-            {isFetching || internalLoading
-              ? "Loading…"
-              : `${filteredInternal.length + filtered.length} results`}
+            {loading ? "Loading…" : `${filteredInternal.length + importedJobs.length}${hasNextPage ? "+" : ""} results`}
           </span>
         </div>
 
-        {isLoading && internalLoading ? (
+        {loading ? (
           <div className="space-y-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="rounded-xl border p-5">
@@ -186,22 +252,31 @@ function HomePage() {
               </div>
             ))}
           </div>
-        ) : filteredInternal.length || filtered.length ? (
-          <div className="space-y-4 animate-in fade-in duration-500">
-            {filteredInternal.map((j) => <JobCard key={j.id} job={j} />)}
-            {filtered.map((j) => <ExternalJobCard key={j.id} job={j} />)}
-          </div>
-        ) : (
+        ) : empty ? (
           <div className="rounded-xl border border-dashed p-10 text-center">
             <SearchX className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
             <p className="text-sm font-medium">No jobs available</p>
             <p className="mt-1 text-xs text-muted-foreground">
               {committed.q || committed.location || filter !== "all"
-                ? "Try a different keyword, clear the location, or switch to \"All Jobs\"."
-                : "Check back soon — new roles are posted every day."}
+                ? 'Try a different keyword, clear the location, or switch back to "Latest".'
+                : "Check back soon — new verified roles are imported every 30 minutes."}
             </p>
             {(committed.q || committed.location || filter !== "all") && (
               <Button variant="outline" size="sm" className="mt-4" onClick={() => { setQ(""); setLocation(""); setCommitted({ q: "", location: "" }); setFilter("all"); }}>Reset filters</Button>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-4 animate-in fade-in duration-500">
+            {filteredInternal.map((j) => <JobCard key={j.id} job={j} />)}
+            {importedJobs.map((j) => <ImportedJobCard key={j.id} job={j} />)}
+            <div ref={observe} />
+            {isFetchingNextPage && (
+              <div className="rounded-xl border p-5">
+                <div className="flex gap-4"><Skeleton className="h-12 w-12 rounded-xl" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-1/3" /><Skeleton className="h-5 w-2/3" /></div></div>
+              </div>
+            )}
+            {!hasNextPage && importedJobs.length > 0 && (
+              <p className="pt-2 text-center text-xs text-muted-foreground">You've reached the end of the feed.</p>
             )}
           </div>
         )}

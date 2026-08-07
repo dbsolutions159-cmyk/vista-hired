@@ -300,6 +300,129 @@ export type Database = {
           },
         ]
       }
+      external_jobs: {
+        Row: {
+          apply_url: string
+          benefits: string | null
+          category: string | null
+          city: string | null
+          company_career_url: string | null
+          company_logo_url: string | null
+          company_name: string
+          country: string | null
+          dedupe_key: string
+          department: string | null
+          description: string
+          employment_type: string
+          experience: string | null
+          experience_level: string | null
+          expires_at: string | null
+          external_id: string
+          id: string
+          imported_at: string
+          is_active: boolean
+          location_text: string
+          published_at: string
+          raw: Json | null
+          remote_type: string
+          requirements: string | null
+          responsibilities: string | null
+          salary_currency: string | null
+          salary_max: number | null
+          salary_min: number | null
+          salary_text: string | null
+          skills: string[]
+          source: string
+          source_logo_url: string | null
+          state: string | null
+          summary: string | null
+          title: string
+          updated_at: string
+          verified: boolean
+          view_count: number
+        }
+        Insert: {
+          apply_url: string
+          benefits?: string | null
+          category?: string | null
+          city?: string | null
+          company_career_url?: string | null
+          company_logo_url?: string | null
+          company_name: string
+          country?: string | null
+          dedupe_key: string
+          department?: string | null
+          description?: string
+          employment_type?: string
+          experience?: string | null
+          experience_level?: string | null
+          expires_at?: string | null
+          external_id: string
+          id?: string
+          imported_at?: string
+          is_active?: boolean
+          location_text?: string
+          published_at?: string
+          raw?: Json | null
+          remote_type?: string
+          requirements?: string | null
+          responsibilities?: string | null
+          salary_currency?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          salary_text?: string | null
+          skills?: string[]
+          source: string
+          source_logo_url?: string | null
+          state?: string | null
+          summary?: string | null
+          title: string
+          updated_at?: string
+          verified?: boolean
+          view_count?: number
+        }
+        Update: {
+          apply_url?: string
+          benefits?: string | null
+          category?: string | null
+          city?: string | null
+          company_career_url?: string | null
+          company_logo_url?: string | null
+          company_name?: string
+          country?: string | null
+          dedupe_key?: string
+          department?: string | null
+          description?: string
+          employment_type?: string
+          experience?: string | null
+          experience_level?: string | null
+          expires_at?: string | null
+          external_id?: string
+          id?: string
+          imported_at?: string
+          is_active?: boolean
+          location_text?: string
+          published_at?: string
+          raw?: Json | null
+          remote_type?: string
+          requirements?: string | null
+          responsibilities?: string | null
+          salary_currency?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          salary_text?: string | null
+          skills?: string[]
+          source?: string
+          source_logo_url?: string | null
+          state?: string | null
+          summary?: string | null
+          title?: string
+          updated_at?: string
+          verified?: boolean
+          view_count?: number
+        }
+        Relationships: []
+      }
       interviews: {
         Row: {
           application_id: string
@@ -403,6 +526,156 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      job_import_logs: {
+        Row: {
+          board_token: string | null
+          connector: string
+          created_at: string
+          duplicate_count: number
+          duration_ms: number | null
+          error: string | null
+          failure_count: number
+          fetched_count: number
+          finished_at: string | null
+          id: string
+          imported_count: number
+          retry_count: number
+          skipped_count: number
+          started_at: string
+          status: string
+          updated_count: number
+        }
+        Insert: {
+          board_token?: string | null
+          connector: string
+          created_at?: string
+          duplicate_count?: number
+          duration_ms?: number | null
+          error?: string | null
+          failure_count?: number
+          fetched_count?: number
+          finished_at?: string | null
+          id?: string
+          imported_count?: number
+          retry_count?: number
+          skipped_count?: number
+          started_at?: string
+          status?: string
+          updated_count?: number
+        }
+        Update: {
+          board_token?: string | null
+          connector?: string
+          created_at?: string
+          duplicate_count?: number
+          duration_ms?: number | null
+          error?: string | null
+          failure_count?: number
+          fetched_count?: number
+          finished_at?: string | null
+          id?: string
+          imported_count?: number
+          retry_count?: number
+          skipped_count?: number
+          started_at?: string
+          status?: string
+          updated_count?: number
+        }
+        Relationships: []
+      }
+      job_reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          external_job_id: string | null
+          id: string
+          job_id: string | null
+          reason: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          external_job_id?: string | null
+          id?: string
+          job_id?: string | null
+          reason: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          external_job_id?: string | null
+          id?: string
+          job_id?: string | null
+          reason?: string
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_reports_external_job_id_fkey"
+            columns: ["external_job_id"]
+            isOneToOne: false
+            referencedRelation: "external_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_reports_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_sources: {
+        Row: {
+          board_token: string | null
+          company_career_url: string | null
+          company_logo_url: string | null
+          company_name: string | null
+          connector: string
+          created_at: string
+          enabled: boolean
+          id: string
+          last_error: string | null
+          last_status: string | null
+          last_synced_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          board_token?: string | null
+          company_career_url?: string | null
+          company_logo_url?: string | null
+          company_name?: string | null
+          connector: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          last_error?: string | null
+          last_status?: string | null
+          last_synced_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          board_token?: string | null
+          company_career_url?: string | null
+          company_logo_url?: string | null
+          company_name?: string | null
+          connector?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          last_error?: string | null
+          last_status?: string | null
+          last_synced_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       jobs: {
         Row: {
@@ -692,6 +965,7 @@ export type Database = {
         Row: {
           created_at: string
           external_id: string
+          external_job_id: string | null
           id: string
           payload: Json
           source: string
@@ -700,6 +974,7 @@ export type Database = {
         Insert: {
           created_at?: string
           external_id: string
+          external_job_id?: string | null
           id?: string
           payload: Json
           source: string
@@ -708,12 +983,21 @@ export type Database = {
         Update: {
           created_at?: string
           external_id?: string
+          external_job_id?: string | null
           id?: string
           payload?: Json
           source?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "saved_external_jobs_external_job_id_fkey"
+            columns: ["external_job_id"]
+            isOneToOne: false
+            referencedRelation: "external_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       saved_jobs: {
         Row: {
