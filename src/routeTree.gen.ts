@@ -18,6 +18,7 @@ import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedHiringRouteImport } from './routes/_authenticated/hiring'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile.index'
 import { Route as AuthenticatedHiringIndexRouteImport } from './routes/_authenticated/hiring.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedProfileEditRouteImport } from './routes/_authenticated/profile.edit'
@@ -75,6 +76,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProfileIndexRoute =
+  AuthenticatedProfileIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
 const AuthenticatedHiringIndexRoute =
   AuthenticatedHiringIndexRouteImport.update({
     id: '/',
@@ -163,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/profile/edit': typeof AuthenticatedProfileEditRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/hiring/': typeof AuthenticatedHiringIndexRoute
+  '/profile/': typeof AuthenticatedProfileIndexRoute
   '/admin/applications/$id': typeof AuthenticatedAdminApplicationsIdRoute
   '/hiring/candidates/$appId': typeof AuthenticatedHiringCandidatesAppIdRoute
 }
@@ -171,7 +179,6 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/post-job': typeof PostJobRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/jobs/$id': typeof JobsIdRoute
   '/admin/applications': typeof AuthenticatedAdminApplicationsRouteWithChildren
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/profile/edit': typeof AuthenticatedProfileEditRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/hiring': typeof AuthenticatedHiringIndexRoute
+  '/profile': typeof AuthenticatedProfileIndexRoute
   '/admin/applications/$id': typeof AuthenticatedAdminApplicationsIdRoute
   '/hiring/candidates/$appId': typeof AuthenticatedHiringCandidatesAppIdRoute
 }
@@ -207,6 +215,7 @@ export interface FileRoutesById {
   '/_authenticated/profile/edit': typeof AuthenticatedProfileEditRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/hiring/': typeof AuthenticatedHiringIndexRoute
+  '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
   '/_authenticated/admin/applications/$id': typeof AuthenticatedAdminApplicationsIdRoute
   '/_authenticated/hiring/candidates/$appId': typeof AuthenticatedHiringCandidatesAppIdRoute
 }
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/profile/edit'
     | '/admin/'
     | '/hiring/'
+    | '/profile/'
     | '/admin/applications/$id'
     | '/hiring/candidates/$appId'
   fileRoutesByTo: FileRoutesByTo
@@ -239,7 +249,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/post-job'
     | '/sitemap.xml'
-    | '/profile'
     | '/jobs/$id'
     | '/admin/applications'
     | '/admin/jobs'
@@ -251,6 +260,7 @@ export interface FileRouteTypes {
     | '/profile/edit'
     | '/admin'
     | '/hiring'
+    | '/profile'
     | '/admin/applications/$id'
     | '/hiring/candidates/$appId'
   id:
@@ -274,6 +284,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile/edit'
     | '/_authenticated/admin/'
     | '/_authenticated/hiring/'
+    | '/_authenticated/profile/'
     | '/_authenticated/admin/applications/$id'
     | '/_authenticated/hiring/candidates/$appId'
   fileRoutesById: FileRoutesById
@@ -351,6 +362,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile/': {
+      id: '/_authenticated/profile/'
+      path: '/'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof AuthenticatedProfileIndexRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
     }
     '/_authenticated/hiring/': {
       id: '/_authenticated/hiring/'
@@ -494,10 +512,12 @@ const AuthenticatedHiringRouteWithChildren =
 
 interface AuthenticatedProfileRouteChildren {
   AuthenticatedProfileEditRoute: typeof AuthenticatedProfileEditRoute
+  AuthenticatedProfileIndexRoute: typeof AuthenticatedProfileIndexRoute
 }
 
 const AuthenticatedProfileRouteChildren: AuthenticatedProfileRouteChildren = {
   AuthenticatedProfileEditRoute: AuthenticatedProfileEditRoute,
+  AuthenticatedProfileIndexRoute: AuthenticatedProfileIndexRoute,
 }
 
 const AuthenticatedProfileRouteWithChildren =
