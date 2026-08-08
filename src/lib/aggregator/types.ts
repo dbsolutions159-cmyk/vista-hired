@@ -44,6 +44,10 @@ export type Connector = {
   id: string;
   label: string;
   logo: string | null;
+  /** Env var names that must be present for this connector to run. */
+  requiresEnv?: string[];
+  /** True when the source row must carry a board token. */
+  requiresBoardToken?: boolean;
   /** Fetch the current openings for one configured board/source. */
   fetchJobs(source: SourceConfig): Promise<RawJob[]>;
 };

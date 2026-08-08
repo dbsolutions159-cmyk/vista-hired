@@ -29,6 +29,7 @@ export const adzunaConnector: Connector = {
   id: "adzuna",
   label: "Adzuna",
   logo: null,
+  requiresEnv: ["ADZUNA_APP_ID", "ADZUNA_APP_KEY"],
   async fetchJobs(source) {
     const appId = process.env["ADZUNA_APP_ID"];
     const appKey = process.env["ADZUNA_APP_KEY"];
@@ -97,6 +98,7 @@ export const greenhouseConnector: Connector = {
   id: "greenhouse",
   label: "Greenhouse",
   logo: null,
+  requiresBoardToken: true,
   async fetchJobs(source) {
     const board = requireBoard(source);
     const json = await getJson(`https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(board)}/jobs?content=true`);
@@ -120,6 +122,7 @@ export const leverConnector: Connector = {
   id: "lever",
   label: "Lever",
   logo: null,
+  requiresBoardToken: true,
   async fetchJobs(source) {
     const board = requireBoard(source);
     const json = await getJson(`https://api.lever.co/v0/postings/${encodeURIComponent(board)}?mode=json`);
@@ -146,6 +149,7 @@ export const ashbyConnector: Connector = {
   id: "ashby",
   label: "Ashby",
   logo: null,
+  requiresBoardToken: true,
   async fetchJobs(source) {
     const board = requireBoard(source);
     const json = await getJson(
@@ -174,21 +178,44 @@ export const workableConnector: Connector = {
   id: "workable",
   label: "Workable",
   logo: null,
+  requiresBoardToken: true,
   async fetchJobs(source) {
     const board = requireBoard(source);
-    const json = await getJson(`https://apply.workable.com/api/v1/widget/accounts/${encodeURIComponent(board)}?details=true`);
-    return (json?.jobs ?? []).map((j: any): RawJob => ({
+    // v3 is the endpoint the live board uses; the legacy widget is kept as a fallback.
+    let rows: any[] = [];
+    try {
+      const v3 = await getJson(`https://apply.workable.com/api/v3/accounts/${encodeURIComponent(board)}/jobs`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: "", location: [], department: [], worktype: [], remote: [] }),
+      });
+      rows = Array.isArray(v3?.results) ? v3.results : [];
+    } catch {
+      rows = [];
+    }
+    if (!rows.length) {
+      const widget = await getJson(
+        `https://apply.workable.com/api/v1/widget/accounts/${encodeURIComponent(board)}?details=true`,
+      );
+      rows = Array.isArray(widget?.jobs) ? widget.jobs : [];
+    }
+    return rows.map((j: any): RawJob => ({
       external_id: String(j.shortcode ?? j.id),
       title: j.title ?? "",
-      company_name: source.company_name || json?.name || board,
-      apply_url: j.application_url || j.url || j.shortlink || "",
+      company_name: source.company_name || board,
+      apply_url:
+        j.application_url || j.url || j.shortlink ||
+        (j.shortcode ? `https://apply.workable.com/${board}/j/${j.shortcode}/` : ""),
       company_career_url: `https://apply.workable.com/${board}`,
-      location_text: [j.city, j.state, j.country].filter(Boolean).join(", "),
-      remote_hint: j.telecommuting ?? null,
+      location_text:
+        [j.city ?? j.location?.city, j.state ?? j.location?.region, j.country ?? j.location?.country]
+          .filter(Boolean)
+          .join(", ") || (j.locations ?? []).map((l: any) => [l.city, l.country].filter(Boolean).join(", ")).join(" | "),
+      remote_hint: j.telecommuting ?? j.remote ?? (j.workplace ? j.workplace === "remote" : null),
       description: `${j.description ?? ""}\n${j.requirements ?? ""}\n${j.benefits ?? ""}`,
       department: j.department ?? null,
       employment_type_hint: j.employment_type ?? j.type ?? null,
-      published_at: j.published_on ?? j.created_at ?? null,
+      published_at: j.published_on ?? j.published ?? j.created_at ?? null,
       raw: null,
     }));
   },
@@ -199,10 +226,11 @@ export const smartRecruitersConnector: Connector = {
   id: "smartrecruiters",
   label: "SmartRecruiters",
   logo: null,
+  requiresBoardToken: true,
   async fetchJobs(source) {
     const board = requireBoard(source);
     const list = await getJson(
-      `https://api.smartrecruiters.com/v1/companies/${encodeURIComponent(board)}/postings?limit=100&country=in`,
+      `https://api.smartrecruiters.com/v1/companies/${encodeURIComponent(board)}/postings?limit=100`,
     );
     const jobs: RawJob[] = [];
     for (const p of (list?.content ?? []).slice(0, 60)) {

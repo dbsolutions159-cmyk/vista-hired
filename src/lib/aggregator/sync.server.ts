@@ -36,7 +36,29 @@ export async function runJobSync(opts: { connector?: string } = {}): Promise<Syn
     const startedAt = new Date();
     const t0 = Date.now();
     if (!connector) {
-      await logRun(src, startedAt, t0, { status: "failed", error: `No connector registered for "${src.connector}"` });
+      const msg = `No connector registered for "${src.connector}"`;
+      console.error(`[job-sync] ${src.connector}: ${msg}`);
+      await logRun(src, startedAt, t0, { status: "failed", error: msg });
+      await markSource(src, "failed", msg);
+      totals.failures++;
+      continue;
+    }
+
+    // Fail loudly (and specifically) when the provider has no credentials configured.
+    const missingEnv = (connector.requiresEnv ?? []).filter((k) => !process.env[k]);
+    if (missingEnv.length) {
+      const msg = `Missing credentials: ${missingEnv.join(", ")}`;
+      console.error(`[job-sync] ${src.connector}: ${msg}`);
+      await logRun(src, startedAt, t0, { status: "missing_credentials", error: msg });
+      await markSource(src, "missing_credentials", msg);
+      totals.failures++;
+      continue;
+    }
+    if (connector.requiresBoardToken && !src.board_token) {
+      const msg = `Missing board token for ${connector.label}`;
+      console.error(`[job-sync] ${src.connector}: ${msg}`);
+      await logRun(src, startedAt, t0, { status: "failed", error: msg });
+      await markSource(src, "failed", msg);
       totals.failures++;
       continue;
     }
@@ -65,6 +87,7 @@ export async function runJobSync(opts: { connector?: string } = {}): Promise<Syn
 
       let imported = 0;
       let failures = 0;
+      let lastError: string | null = null;
       const importedKeys: string[] = [];
       for (let i = 0; i < normalized.length; i += 100) {
         const chunk = normalized.slice(i, i + 100);
@@ -73,6 +96,8 @@ export async function runJobSync(opts: { connector?: string } = {}): Promise<Syn
           .upsert(chunk as never, { onConflict: "dedupe_key" })
           .select("id, dedupe_key");
         if (upErr) {
+          console.error(`[job-sync] ${src.connector}${src.board_token ? `/${src.board_token}` : ""}: upsert failed — ${upErr.message}`);
+          lastError = upErr.message;
           failures += chunk.length;
           continue;
         }
@@ -101,7 +126,11 @@ export async function runJobSync(opts: { connector?: string } = {}): Promise<Syn
       totals.failures += failures;
       totals.deactivated += deactivated;
 
+      console.log(
+        `[job-sync] ${src.connector}${src.board_token ? `/${src.board_token}` : ""}: fetched=${raw.length} imported=${imported} skipped=${skipped} duplicates=${duplicates} failures=${failures}`,
+      );
       await logRun(src, startedAt, t0, {
+        error: lastError ?? undefined,
         status: failures ? "partial" : "success",
         fetched: raw.length,
         imported,
@@ -110,23 +139,25 @@ export async function runJobSync(opts: { connector?: string } = {}): Promise<Syn
         failures,
         deactivated,
       });
-      await supabaseAdmin
-        .from("job_sources")
-        .update({ last_synced_at: new Date().toISOString(), last_status: failures ? "partial" : "success", last_error: null })
-        .eq("id", src.id);
+      await markSource(src, failures ? "partial" : "success", lastError);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
+      console.error(`[job-sync] ${src.connector}${src.board_token ? `/${src.board_token}` : ""}: ${message}`);
       totals.failures++;
       await logRun(src, startedAt, t0, { status: "failed", error: message.slice(0, 500) });
-      await supabaseAdmin
-        .from("job_sources")
-        .update({ last_synced_at: new Date().toISOString(), last_status: "failed", last_error: message.slice(0, 500) })
-        .eq("id", src.id);
+      await markSource(src, "failed", message.slice(0, 500));
     }
   }
 
   totals.durationMs = Date.now() - startedAll;
   return totals;
+}
+
+async function markSource(src: SourceConfig, status: string, error: string | null) {
+  await supabaseAdmin
+    .from("job_sources")
+    .update({ last_synced_at: new Date().toISOString(), last_status: status, last_error: error })
+    .eq("id", src.id);
 }
 
 async function logRun(
