@@ -181,19 +181,41 @@ export const workableConnector: Connector = {
   requiresBoardToken: true,
   async fetchJobs(source) {
     const board = requireBoard(source);
-    const json = await getJson(`https://apply.workable.com/api/v1/widget/accounts/${encodeURIComponent(board)}?details=true`);
-    return (json?.jobs ?? []).map((j: any): RawJob => ({
+    // v3 is the endpoint the live board uses; the legacy widget is kept as a fallback.
+    let rows: any[] = [];
+    try {
+      const v3 = await getJson(`https://apply.workable.com/api/v3/accounts/${encodeURIComponent(board)}/jobs`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: "", location: [], department: [], worktype: [], remote: [] }),
+      });
+      rows = Array.isArray(v3?.results) ? v3.results : [];
+    } catch {
+      rows = [];
+    }
+    if (!rows.length) {
+      const widget = await getJson(
+        `https://apply.workable.com/api/v1/widget/accounts/${encodeURIComponent(board)}?details=true`,
+      );
+      rows = Array.isArray(widget?.jobs) ? widget.jobs : [];
+    }
+    return rows.map((j: any): RawJob => ({
       external_id: String(j.shortcode ?? j.id),
       title: j.title ?? "",
-      company_name: source.company_name || json?.name || board,
-      apply_url: j.application_url || j.url || j.shortlink || "",
+      company_name: source.company_name || board,
+      apply_url:
+        j.application_url || j.url || j.shortlink ||
+        (j.shortcode ? `https://apply.workable.com/${board}/j/${j.shortcode}/` : ""),
       company_career_url: `https://apply.workable.com/${board}`,
-      location_text: [j.city, j.state, j.country].filter(Boolean).join(", "),
-      remote_hint: j.telecommuting ?? null,
+      location_text:
+        [j.city ?? j.location?.city, j.state ?? j.location?.region, j.country ?? j.location?.country]
+          .filter(Boolean)
+          .join(", ") || (j.locations ?? []).map((l: any) => [l.city, l.country].filter(Boolean).join(", ")).join(" | "),
+      remote_hint: j.telecommuting ?? j.remote ?? j.workplace === "remote" ?? null,
       description: `${j.description ?? ""}\n${j.requirements ?? ""}\n${j.benefits ?? ""}`,
       department: j.department ?? null,
       employment_type_hint: j.employment_type ?? j.type ?? null,
-      published_at: j.published_on ?? j.created_at ?? null,
+      published_at: j.published_on ?? j.published ?? j.created_at ?? null,
       raw: null,
     }));
   },
