@@ -211,7 +211,7 @@ export const workableConnector: Connector = {
         [j.city ?? j.location?.city, j.state ?? j.location?.region, j.country ?? j.location?.country]
           .filter(Boolean)
           .join(", ") || (j.locations ?? []).map((l: any) => [l.city, l.country].filter(Boolean).join(", ")).join(" | "),
-      remote_hint: j.telecommuting ?? j.remote ?? j.workplace === "remote" ?? null,
+      remote_hint: j.telecommuting ?? j.remote ?? (j.workplace ? j.workplace === "remote" : null),
       description: `${j.description ?? ""}\n${j.requirements ?? ""}\n${j.benefits ?? ""}`,
       department: j.department ?? null,
       employment_type_hint: j.employment_type ?? j.type ?? null,
