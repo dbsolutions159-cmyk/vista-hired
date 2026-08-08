@@ -29,6 +29,7 @@ export const adzunaConnector: Connector = {
   id: "adzuna",
   label: "Adzuna",
   logo: null,
+  requiresEnv: ["ADZUNA_APP_ID", "ADZUNA_APP_KEY"],
   async fetchJobs(source) {
     const appId = process.env["ADZUNA_APP_ID"];
     const appKey = process.env["ADZUNA_APP_KEY"];
@@ -97,6 +98,7 @@ export const greenhouseConnector: Connector = {
   id: "greenhouse",
   label: "Greenhouse",
   logo: null,
+  requiresBoardToken: true,
   async fetchJobs(source) {
     const board = requireBoard(source);
     const json = await getJson(`https://boards-api.greenhouse.io/v1/boards/${encodeURIComponent(board)}/jobs?content=true`);
@@ -120,6 +122,7 @@ export const leverConnector: Connector = {
   id: "lever",
   label: "Lever",
   logo: null,
+  requiresBoardToken: true,
   async fetchJobs(source) {
     const board = requireBoard(source);
     const json = await getJson(`https://api.lever.co/v0/postings/${encodeURIComponent(board)}?mode=json`);
@@ -146,6 +149,7 @@ export const ashbyConnector: Connector = {
   id: "ashby",
   label: "Ashby",
   logo: null,
+  requiresBoardToken: true,
   async fetchJobs(source) {
     const board = requireBoard(source);
     const json = await getJson(
@@ -174,6 +178,7 @@ export const workableConnector: Connector = {
   id: "workable",
   label: "Workable",
   logo: null,
+  requiresBoardToken: true,
   async fetchJobs(source) {
     const board = requireBoard(source);
     const json = await getJson(`https://apply.workable.com/api/v1/widget/accounts/${encodeURIComponent(board)}?details=true`);
@@ -199,10 +204,11 @@ export const smartRecruitersConnector: Connector = {
   id: "smartrecruiters",
   label: "SmartRecruiters",
   logo: null,
+  requiresBoardToken: true,
   async fetchJobs(source) {
     const board = requireBoard(source);
     const list = await getJson(
-      `https://api.smartrecruiters.com/v1/companies/${encodeURIComponent(board)}/postings?limit=100&country=in`,
+      `https://api.smartrecruiters.com/v1/companies/${encodeURIComponent(board)}/postings?limit=100`,
     );
     const jobs: RawJob[] = [];
     for (const p of (list?.content ?? []).slice(0, 60)) {
