@@ -26,6 +26,7 @@ function AdminLayout() {
           <Button asChild variant="ghost" size="sm" className="rounded-full"><Link to="/admin/submissions"><ClipboardCheck className="mr-1.5 h-4 w-4" />Submissions</Link></Button>
           <Button asChild variant="ghost" size="sm" className="rounded-full"><Link to="/admin/jobs"><Briefcase className="mr-1.5 h-4 w-4" />Jobs</Link></Button>
           <Button asChild variant="ghost" size="sm" className="rounded-full"><Link to="/admin/applications"><FileText className="mr-1.5 h-4 w-4" />Applications</Link></Button>
+          <Button asChild variant="ghost" size="sm" className="rounded-full"><Link to="/admin/imports"><PlugZap className="mr-1.5 h-4 w-4" />Imports</Link></Button>
         </nav>
       </div>
       <Outlet />
