@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router";
-import { BarChart3, Briefcase, ClipboardCheck, FileText, ShieldAlert } from "lucide-react";
+import { BarChart3, Briefcase, ClipboardCheck, FileText, PlugZap, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
