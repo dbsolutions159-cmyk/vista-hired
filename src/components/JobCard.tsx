@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Building2, Heart, MapPin, MessageCircle, Share2, Briefcase, BadgeCheck, Bookmark, Star, Zap, Home, UserRound } from "lucide-react";
+import { Building2, Heart, MapPin, MessageCircle, Briefcase, BadgeCheck, Bookmark, Star, Zap, Home, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { employmentTypeLabels, formatSalary, timeAgo, workTypeLabels, type Job } from "@/lib/jobs";
 import { CommentsSheet } from "@/components/CommentsSheet";
 import { ApplyNowButton, PremiumMembershipButton } from "@/components/JobCta";
+import { ShareJobMenu } from "@/components/ShareJobMenu";
+import { hiresetuJobUrl } from "@/lib/share";
+
 
 
 export function JobCard({ job }: { job: Job }) {
@@ -58,14 +61,8 @@ export function JobCard({ job }: { job: Job }) {
     else { setSaved(true); await supabase.from("saved_jobs").insert({ job_id: job.id, user_id: user!.id }); toast.success("Saved"); }
   };
 
-  const share = async () => {
-    const url = `${window.location.origin}/jobs/${job.id}`;
-    const data = { title: `${job.title} — ${job.company_name}`, text: `Check out ${job.title} at ${job.company_name}`, url };
-    try {
-      if (navigator.share) await navigator.share(data);
-      else { await navigator.clipboard.writeText(url); toast.success("Link copied"); }
-    } catch {}
-  };
+
+
 
   const cover = (job as any).cover_image_url as string | undefined;
   const video = (job as any).video_url as string | undefined;
@@ -129,10 +126,18 @@ export function JobCard({ job }: { job: Job }) {
             <MessageCircle className="h-4 w-4" />
             <span className="tabular-nums">{commentCount}</span>
           </Button>
-          <Button variant="ghost" size="sm" onClick={share} className="gap-1.5">
-            <Share2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Share</span>
-          </Button>
+          <ShareJobMenu
+            label="Share"
+            job={{
+              title: job.title,
+              company: job.company_name,
+              location: job.location,
+              employmentType: employmentTypeLabels[job.employment_type] ?? "Full-time",
+              url: hiresetuJobUrl(job.id),
+              verified: (job as any).verified ?? true,
+            }}
+          />
+
         </div>
         <div className="flex items-center gap-1.5">
           <PremiumMembershipButton jobId={job.id} source="job_card" label="Premium" />

@@ -5,9 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { employmentTypeLabels, formatSalary, timeAgo, workTypeLabels } from "@/lib/jobs";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import ogFallback from "@/assets/hiresetu-og.jpg.asset.json";
 import { ApplyNowButton, PremiumMembershipButton } from "@/components/JobCta";
+import { ShareJobMenu } from "@/components/ShareJobMenu";
+import { SHARE_BANNER_URL, hiresetuJobUrl } from "@/lib/share";
 import { incrementJobView } from "@/lib/jobs.functions";
+
 
 
 
@@ -46,12 +48,11 @@ export const Route = createFileRoute("/jobs/$id")({
     const raw = (job.description || "").replace(/\s+/g, " ").trim();
     const shortDesc = raw.length > 140 ? raw.slice(0, 137) + "…" : raw;
     const description = `${descBits}. ${shortDesc} Apply now on HireSetu.`.slice(0, 300);
+    // Always prefer the HireSetu-branded banner unless the job has its own
+    // purpose-made cover image. Company logos are never the share preview.
     const coverCandidate = (job as any).cover_image_url as string | undefined;
-    const image = coverCandidate && /^https?:\/\//.test(coverCandidate)
-      ? coverCandidate
-      : job.company_logo_url && /^https?:\/\//.test(job.company_logo_url)
-      ? job.company_logo_url
-      : `${SITE_URL}${ogFallback.url}`;
+    const image = coverCandidate && /^https?:\/\//.test(coverCandidate) ? coverCandidate : SHARE_BANNER_URL;
+
 
     return {
       meta: [
@@ -190,7 +191,22 @@ function JobDetail() {
             <ApplyNowButton jobId={job.id} size="lg" source="job_detail" fullWidth />
             <PremiumMembershipButton jobId={job.id} size="lg" source="job_detail" fullWidth />
           </div>
+          <div className="mt-3">
+            <ShareJobMenu
+              variant="outline"
+              label="Share"
+              job={{
+                title: job.title,
+                company: job.company_name,
+                location: job.location,
+                employmentType: employmentTypeLabels[job.employment_type] ?? "Full-time",
+                url: hiresetuJobUrl(job.id),
+                verified: (job as any).verified ?? true,
+              }}
+            />
+          </div>
         </div>
+
         </div>
       </Card>
 

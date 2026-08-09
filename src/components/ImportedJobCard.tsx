@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Bookmark, Briefcase, Building2, CheckCircle2, ExternalLink, Flag, MapPin, Share2, Wifi } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Bookmark, Briefcase, Building2, CheckCircle2, ExternalLink, Flag, MapPin, Wifi } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { PremiumMembershipButton, trackCtaClick } from "@/components/JobCta";
+import { ShareJobMenu } from "@/components/ShareJobMenu";
+import { hiresetuExternalJobUrl } from "@/lib/share";
+
 
 export type ImportedJob = Tables<"external_jobs">;
 
@@ -79,18 +83,15 @@ export function ImportedJobCard({ job }: { job: ImportedJob }) {
     }
   };
 
-  const share = async () => {
-    const text = `${job.title} at ${job.company_name} — ${job.location_text}`;
-    try {
-      if (navigator.share) await navigator.share({ title: text, text, url: job.apply_url });
-      else {
-        await navigator.clipboard.writeText(`${text}\n${job.apply_url}`);
-        toast.success("Job link copied");
-      }
-    } catch {
-      /* user dismissed the share sheet */
-    }
+  const shareInfo = {
+    title: job.title,
+    company: job.company_name,
+    location: job.location_text,
+    employmentType: empLabels[job.employment_type] ?? "Full-time",
+    url: hiresetuExternalJobUrl(job.id),
+    verified: job.verified,
   };
+
 
   const report = async () => {
     if (!user) {
@@ -130,7 +131,10 @@ export function ImportedJobCard({ job }: { job: ImportedJob }) {
               )}
               <span>· {timeAgo(job.published_at)}</span>
             </div>
-            <h3 className="mt-0.5 truncate font-display text-lg font-semibold leading-snug tracking-tight">{job.title}</h3>
+            <Link to="/jobs/external/$id" params={{ id: job.id }} className="block">
+              <h3 className="mt-0.5 truncate font-display text-lg font-semibold leading-snug tracking-tight hover:text-primary">{job.title}</h3>
+            </Link>
+
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
               <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{job.location_text}</span>
               <span className="inline-flex items-center gap-1"><Briefcase className="h-3.5 w-3.5" />{empLabels[job.employment_type] ?? "Full-time"}</span>
@@ -168,10 +172,9 @@ export function ImportedJobCard({ job }: { job: ImportedJob }) {
       </div>
 
       <div className="flex flex-wrap items-center justify-end gap-1.5 border-t bg-muted/30 px-3 py-2">
-        <Button variant="ghost" size="sm" onClick={share} aria-label="Share job">
-          <Share2 className="h-4 w-4" />
-        </Button>
+        <ShareJobMenu job={shareInfo} />
         <Button variant="ghost" size="sm" onClick={report} disabled={reported} aria-label="Report job">
+
           <Flag className="h-4 w-4" />
         </Button>
         <PremiumMembershipButton source="imported_job_card" label="Premium" />
