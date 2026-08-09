@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Bookmark, Briefcase, Building2, CheckCircle2, ExternalLink, Flag, MapPin, Share2, Wifi } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Bookmark, Briefcase, Building2, CheckCircle2, ExternalLink, Flag, MapPin, Wifi } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { PremiumMembershipButton, trackCtaClick } from "@/components/JobCta";
+import { ShareJobMenu } from "@/components/ShareJobMenu";
+import { hiresetuExternalJobUrl } from "@/lib/share";
+
 
 export type ImportedJob = Tables<"external_jobs">;
 
