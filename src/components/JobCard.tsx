@@ -10,6 +10,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { employmentTypeLabels, formatSalary, timeAgo, workTypeLabels, type Job } from "@/lib/jobs";
 import { CommentsSheet } from "@/components/CommentsSheet";
 import { ApplyNowButton, PremiumMembershipButton } from "@/components/JobCta";
+import { ShareJobMenu } from "@/components/ShareJobMenu";
+import { hiresetuJobUrl } from "@/lib/share";
+
 
 
 export function JobCard({ job }: { job: Job }) {
