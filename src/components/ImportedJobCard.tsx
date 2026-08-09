@@ -83,18 +83,15 @@ export function ImportedJobCard({ job }: { job: ImportedJob }) {
     }
   };
 
-  const share = async () => {
-    const text = `${job.title} at ${job.company_name} — ${job.location_text}`;
-    try {
-      if (navigator.share) await navigator.share({ title: text, text, url: job.apply_url });
-      else {
-        await navigator.clipboard.writeText(`${text}\n${job.apply_url}`);
-        toast.success("Job link copied");
-      }
-    } catch {
-      /* user dismissed the share sheet */
-    }
+  const shareInfo = {
+    title: job.title,
+    company: job.company_name,
+    location: job.location_text,
+    employmentType: empLabels[job.employment_type] ?? "Full-time",
+    url: hiresetuExternalJobUrl(job.id),
+    verified: job.verified,
   };
+
 
   const report = async () => {
     if (!user) {
