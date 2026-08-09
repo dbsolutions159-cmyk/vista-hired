@@ -191,7 +191,22 @@ function JobDetail() {
             <ApplyNowButton jobId={job.id} size="lg" source="job_detail" fullWidth />
             <PremiumMembershipButton jobId={job.id} size="lg" source="job_detail" fullWidth />
           </div>
+          <div className="mt-3">
+            <ShareJobMenu
+              variant="outline"
+              label="Share"
+              job={{
+                title: job.title,
+                company: job.company_name,
+                location: job.location,
+                employmentType: employmentTypeLabels[job.employment_type] ?? "Full-time",
+                url: hiresetuJobUrl(job.id),
+                verified: (job as any).verified ?? true,
+              }}
+            />
+          </div>
         </div>
+
         </div>
       </Card>
 
