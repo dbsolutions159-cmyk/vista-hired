@@ -61,14 +61,8 @@ export function JobCard({ job }: { job: Job }) {
     else { setSaved(true); await supabase.from("saved_jobs").insert({ job_id: job.id, user_id: user!.id }); toast.success("Saved"); }
   };
 
-  const share = async () => {
-    const url = `${window.location.origin}/jobs/${job.id}`;
-    const data = { title: `${job.title} — ${job.company_name}`, text: `Check out ${job.title} at ${job.company_name}`, url };
-    try {
-      if (navigator.share) await navigator.share(data);
-      else { await navigator.clipboard.writeText(url); toast.success("Link copied"); }
-    } catch {}
-  };
+
+
 
   const cover = (job as any).cover_image_url as string | undefined;
   const video = (job as any).video_url as string | undefined;
