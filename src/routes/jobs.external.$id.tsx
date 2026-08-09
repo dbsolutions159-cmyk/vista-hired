@@ -289,7 +289,7 @@ function ExternalJobDetail() {
             <div className="mt-6">
               <div className="mb-1.5 text-sm font-semibold">Skills</div>
               <div className="flex flex-wrap gap-1.5">
-                {job.skills.map((s) => (
+                {job.skills.map((s: string) => (
                   <Badge key={s} variant="outline" className="rounded-full">{s}</Badge>
                 ))}
               </div>

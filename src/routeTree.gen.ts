@@ -21,6 +21,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile.index'
 import { Route as AuthenticatedHiringIndexRouteImport } from './routes/_authenticated/hiring.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as JobsExternalIdRouteImport } from './routes/jobs.external.$id'
 import { Route as AuthenticatedProfileEditRouteImport } from './routes/_authenticated/profile.edit'
 import { Route as AuthenticatedHiringJobsRouteImport } from './routes/_authenticated/hiring.jobs'
 import { Route as AuthenticatedHiringInterviewsRouteImport } from './routes/_authenticated/hiring.interviews'
@@ -94,6 +95,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const JobsExternalIdRoute = JobsExternalIdRouteImport.update({
+  id: '/jobs/external/$id',
+  path: '/jobs/external/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedProfileEditRoute =
   AuthenticatedProfileEditRouteImport.update({
@@ -182,6 +188,7 @@ export interface FileRoutesByFullPath {
   '/hiring/interviews': typeof AuthenticatedHiringInterviewsRoute
   '/hiring/jobs': typeof AuthenticatedHiringJobsRoute
   '/profile/edit': typeof AuthenticatedProfileEditRoute
+  '/jobs/external/$id': typeof JobsExternalIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/hiring/': typeof AuthenticatedHiringIndexRoute
   '/profile/': typeof AuthenticatedProfileIndexRoute
@@ -204,6 +211,7 @@ export interface FileRoutesByTo {
   '/hiring/interviews': typeof AuthenticatedHiringInterviewsRoute
   '/hiring/jobs': typeof AuthenticatedHiringJobsRoute
   '/profile/edit': typeof AuthenticatedProfileEditRoute
+  '/jobs/external/$id': typeof JobsExternalIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/hiring': typeof AuthenticatedHiringIndexRoute
   '/profile': typeof AuthenticatedProfileIndexRoute
@@ -231,6 +239,7 @@ export interface FileRoutesById {
   '/_authenticated/hiring/interviews': typeof AuthenticatedHiringInterviewsRoute
   '/_authenticated/hiring/jobs': typeof AuthenticatedHiringJobsRoute
   '/_authenticated/profile/edit': typeof AuthenticatedProfileEditRoute
+  '/jobs/external/$id': typeof JobsExternalIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/hiring/': typeof AuthenticatedHiringIndexRoute
   '/_authenticated/profile/': typeof AuthenticatedProfileIndexRoute
@@ -258,6 +267,7 @@ export interface FileRouteTypes {
     | '/hiring/interviews'
     | '/hiring/jobs'
     | '/profile/edit'
+    | '/jobs/external/$id'
     | '/admin/'
     | '/hiring/'
     | '/profile/'
@@ -280,6 +290,7 @@ export interface FileRouteTypes {
     | '/hiring/interviews'
     | '/hiring/jobs'
     | '/profile/edit'
+    | '/jobs/external/$id'
     | '/admin'
     | '/hiring'
     | '/profile'
@@ -306,6 +317,7 @@ export interface FileRouteTypes {
     | '/_authenticated/hiring/interviews'
     | '/_authenticated/hiring/jobs'
     | '/_authenticated/profile/edit'
+    | '/jobs/external/$id'
     | '/_authenticated/admin/'
     | '/_authenticated/hiring/'
     | '/_authenticated/profile/'
@@ -321,6 +333,7 @@ export interface RootRouteChildren {
   PostJobRoute: typeof PostJobRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   JobsIdRoute: typeof JobsIdRoute
+  JobsExternalIdRoute: typeof JobsExternalIdRoute
   ApiPublicHooksSyncJobsRoute: typeof ApiPublicHooksSyncJobsRoute
 }
 
@@ -409,6 +422,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/jobs/external/$id': {
+      id: '/jobs/external/$id'
+      path: '/jobs/external/$id'
+      fullPath: '/jobs/external/$id'
+      preLoaderRoute: typeof JobsExternalIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/profile/edit': {
       id: '/_authenticated/profile/edit'
@@ -589,18 +609,9 @@ const rootRouteChildren: RootRouteChildren = {
   PostJobRoute: PostJobRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   JobsIdRoute: JobsIdRoute,
+  JobsExternalIdRoute: JobsExternalIdRoute,
   ApiPublicHooksSyncJobsRoute: ApiPublicHooksSyncJobsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
