@@ -129,10 +129,18 @@ export function JobCard({ job }: { job: Job }) {
             <MessageCircle className="h-4 w-4" />
             <span className="tabular-nums">{commentCount}</span>
           </Button>
-          <Button variant="ghost" size="sm" onClick={share} className="gap-1.5">
-            <Share2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Share</span>
-          </Button>
+          <ShareJobMenu
+            label="Share"
+            job={{
+              title: job.title,
+              company: job.company_name,
+              location: job.location,
+              employmentType: employmentTypeLabels[job.employment_type] ?? "Full-time",
+              url: hiresetuJobUrl(job.id),
+              verified: (job as any).verified ?? true,
+            }}
+          />
+
         </div>
         <div className="flex items-center gap-1.5">
           <PremiumMembershipButton jobId={job.id} source="job_card" label="Premium" />
