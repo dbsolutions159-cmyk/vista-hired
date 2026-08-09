@@ -131,7 +131,10 @@ export function ImportedJobCard({ job }: { job: ImportedJob }) {
               )}
               <span>· {timeAgo(job.published_at)}</span>
             </div>
-            <h3 className="mt-0.5 truncate font-display text-lg font-semibold leading-snug tracking-tight">{job.title}</h3>
+            <Link to="/jobs/external/$id" params={{ id: job.id }} className="block">
+              <h3 className="mt-0.5 truncate font-display text-lg font-semibold leading-snug tracking-tight hover:text-primary">{job.title}</h3>
+            </Link>
+
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
               <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{job.location_text}</span>
               <span className="inline-flex items-center gap-1"><Briefcase className="h-3.5 w-3.5" />{empLabels[job.employment_type] ?? "Full-time"}</span>
