@@ -5,9 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { employmentTypeLabels, formatSalary, timeAgo, workTypeLabels } from "@/lib/jobs";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import ogFallback from "@/assets/hiresetu-og.jpg.asset.json";
 import { ApplyNowButton, PremiumMembershipButton } from "@/components/JobCta";
+import { ShareJobMenu } from "@/components/ShareJobMenu";
+import { SHARE_BANNER_URL, hiresetuJobUrl } from "@/lib/share";
 import { incrementJobView } from "@/lib/jobs.functions";
+
 
 
 
