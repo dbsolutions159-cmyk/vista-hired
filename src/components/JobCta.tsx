@@ -66,13 +66,13 @@ export function useHasApplied(jobId?: string | null) {
   return applied;
 }
 
-function portalUrl(jobId?: string | null) {
-  if (!jobId) return CANDIDATE_PORTAL_URL;
-  const url = new URL(CANDIDATE_PORTAL_URL);
-  url.searchParams.set("job_id", jobId);
-  return url.toString();
-}
-
+/**
+ * Membership-gated apply button.
+ *
+ * The destination URL is NEVER rendered for non-members — it is fetched from
+ * the server only after it re-verifies an active membership, so the lock
+ * cannot be bypassed from the browser.
+ */
 export function ApplyNowButton({
   jobId,
   externalJobId,
@@ -89,7 +89,12 @@ export function ApplyNowButton({
   fullWidth?: boolean;
 }) {
   const { user } = useAuth();
+  const { state, loading } = useMembership();
   const applied = useHasApplied(jobId);
+  const [unlocking, setUnlocking] = useState(false);
+  const resolve = useServerFn(resolveApplyUrl);
+
+  const width = fullWidth ? "w-full" : "";
 
   if (applied) {
     return (
@@ -97,7 +102,7 @@ export function ApplyNowButton({
         size={size}
         disabled
         aria-disabled="true"
-        className={`border border-emerald-500/40 bg-emerald-500/10 text-emerald-700 opacity-100 hover:bg-emerald-500/10 dark:text-emerald-400 ${fullWidth ? "w-full" : ""} ${className}`}
+        className={`border border-emerald-500/40 bg-emerald-500/10 text-emerald-700 opacity-100 hover:bg-emerald-500/10 dark:text-emerald-400 ${width} ${className}`}
       >
         <CheckCircle2 className="mr-1.5 h-4 w-4" />
         Already Applied
@@ -105,21 +110,68 @@ export function ApplyNowButton({
     );
   }
 
+  const goPremium = () => {
+    trackCtaClick({ cta: "unlock_apply", jobId, externalJobId, userId: user?.id, source });
+    window.open(
+      premiumUrlWithReturn(typeof window !== "undefined" ? window.location.href : undefined),
+      "_blank",
+      "noopener,noreferrer",
+    );
+  };
+
+  // Visitor, non-member and expired states all keep the URL hidden.
+  if (state !== "active") {
+    const label = state === "expired" ? "Renew to Apply" : "Apply Now";
+    return (
+      <Button
+        size={size}
+        onClick={goPremium}
+        title="Membership required to apply"
+        className={`gradient-primary text-primary-foreground shadow-soft ${width} ${className}`}
+      >
+        {loading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Lock className="mr-1.5 h-4 w-4" />}
+        {label}
+      </Button>
+    );
+  }
+
+  const unlockAndApply = async () => {
+    setUnlocking(true);
+    // Open synchronously so the browser doesn't treat this as a popup.
+    const tab = window.open("", "_blank", "noopener,noreferrer");
+    try {
+      trackCtaClick({ cta: "apply_now", jobId, externalJobId, userId: user?.id, source });
+      const res = await resolve({
+        data: jobId ? { jobId } : { externalJobId: externalJobId! },
+      });
+      if (res.ok) {
+        if (tab) tab.location.href = res.url;
+        else window.open(res.url, "_blank", "noopener,noreferrer");
+      } else {
+        tab?.close();
+        if (res.reason === "membership_required") {
+          toast.error("Your membership is no longer active");
+          goPremium();
+        } else if (res.reason === "closed") toast.error("Applications for this job are closed");
+        else toast.error("This job is no longer available");
+      }
+    } catch {
+      tab?.close();
+      toast.error("Couldn't open the application page");
+    } finally {
+      setUnlocking(false);
+    }
+  };
+
   return (
     <Button
-      asChild
       size={size}
-      className={`gradient-primary text-primary-foreground shadow-soft ${fullWidth ? "w-full" : ""} ${className}`}
+      disabled={unlocking}
+      onClick={() => void unlockAndApply()}
+      className={`gradient-primary text-primary-foreground shadow-soft ${width} ${className}`}
     >
-      <a
-        href={portalUrl(jobId)}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={() => trackCtaClick({ cta: "apply_now", jobId, externalJobId, userId: user?.id, source })}
-      >
-        <Send className="mr-1.5 h-4 w-4" />
-        Apply Now
-      </a>
+      {unlocking ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-1.5 h-4 w-4" />}
+      Apply Now
     </Button>
   );
 }
