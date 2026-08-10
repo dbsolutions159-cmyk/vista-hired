@@ -1,13 +1,23 @@
-import { Crown, Send, CheckCircle2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Crown, Send, CheckCircle2, Lock, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { SUBSCRIPTION_URL } from "@/components/SubscriptionButtons";
+import { premiumUrlWithReturn, useMembership } from "@/lib/membership";
+import { resolveApplyUrl } from "@/lib/apply.functions";
 
 export const CANDIDATE_PORTAL_URL = "https://hiresetu-candidate-portal.lovable.app";
 
-type CtaKind = "apply_now" | "premium_membership";
+type CtaKind =
+  | "apply_now"
+  | "premium_membership"
+  | "unlock_apply"
+  | "save_job"
+  | "share_job"
+  | "view_job";
 
 /** Fire-and-forget CTA click tracking. Never blocks navigation. */
 export function trackCtaClick(opts: {
