@@ -127,9 +127,9 @@ export const updateJob = createServerFn({ method: "POST" })
     await assertCanManage(context as never, data.jobId);
     const patch = Object.fromEntries(
       Object.entries(data.patch).filter(([, v]) => v !== undefined),
-    );
+    ) as Record<string, unknown>;
     if (Object.keys(patch).length === 0) return { ok: true };
-    const { error } = await context.supabase.from("jobs").update(patch).eq("id", data.jobId);
+    const { error } = await context.supabase.from("jobs").update(patch as never).eq("id", data.jobId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
