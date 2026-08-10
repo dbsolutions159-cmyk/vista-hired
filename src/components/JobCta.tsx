@@ -1,5 +1,5 @@
 import { useServerFn } from "@tanstack/react-start";
-import { Crown, Send, CheckCircle2, Lock, Loader2 } from "lucide-react";
+import { Crown, CheckCircle2, Lock, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
