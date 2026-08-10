@@ -9,7 +9,7 @@ import { ImportedJobCard, type ImportedJob } from "@/components/ImportedJobCard"
 import { JobCard } from "@/components/JobCard";
 import { LocationPicker } from "@/components/LocationPicker";
 import { supabase } from "@/integrations/supabase/client";
-import type { Job } from "@/lib/jobs";
+import { JOB_COLUMNS, EXTERNAL_JOB_COLUMNS, type Job } from "@/lib/jobs";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
