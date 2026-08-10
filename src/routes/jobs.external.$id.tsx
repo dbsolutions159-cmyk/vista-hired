@@ -6,7 +6,6 @@ import {
   Building2,
   CalendarDays,
   CheckCircle2,
-  ExternalLink,
   Flag,
   MapPin,
   Wifi,
@@ -18,9 +17,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { PremiumMembershipButton, trackCtaClick } from "@/components/JobCta";
+import { ApplyNowButton, PremiumMembershipButton } from "@/components/JobCta";
 import { ShareJobMenu } from "@/components/ShareJobMenu";
 import { SHARE_BANNER_URL, SITE_URL, hiresetuExternalJobUrl } from "@/lib/share";
+import { EXTERNAL_JOB_COLUMNS } from "@/lib/jobs";
 
 const empLabels: Record<string, string> = {
   full_time: "Full-time",
@@ -50,7 +50,7 @@ export const Route = createFileRoute("/jobs/external/$id")({
   loader: async ({ params }) => {
     const { data, error } = await supabase
       .from("external_jobs")
-      .select("*")
+      .select(EXTERNAL_JOB_COLUMNS)
       .eq("id", params.id)
       .maybeSingle();
     if (error) throw error;
@@ -299,18 +299,7 @@ function ExternalJobDetail() {
           <div className="mt-8 rounded-xl border bg-muted/30 p-4">
             <div className="mb-3 text-sm font-semibold">Ready to take the next step?</div>
             <div className="grid gap-2 sm:grid-cols-2">
-              <Button
-                asChild
-                size="lg"
-                className="w-full gradient-primary text-primary-foreground shadow-soft"
-                onClick={() =>
-                  trackCtaClick({ cta: "apply_now", externalJobId: job.id, userId: user?.id, source: "external_job_detail" })
-                }
-              >
-                <a href={job.apply_url} target="_blank" rel="noopener noreferrer">
-                  Apply Now <ExternalLink className="ml-1.5 h-4 w-4" />
-                </a>
-              </Button>
+              <ApplyNowButton externalJobId={job.id} size="lg" source="external_job_detail" fullWidth />
               <PremiumMembershipButton size="lg" source="external_job_detail" fullWidth />
             </div>
             <div className="mt-3 flex flex-wrap items-center gap-2">

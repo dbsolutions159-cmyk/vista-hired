@@ -689,6 +689,7 @@ export type Database = {
           cover_image_url: string | null
           created_at: string
           created_by: string | null
+          deleted_at: string | null
           department: string | null
           description: string
           employment_type: Database["public"]["Enums"]["employment_type"]
@@ -728,6 +729,7 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
           department?: string | null
           description: string
           employment_type?: Database["public"]["Enums"]["employment_type"]
@@ -767,6 +769,7 @@ export type Database = {
           cover_image_url?: string | null
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
           department?: string | null
           description?: string
           employment_type?: Database["public"]["Enums"]["employment_type"]
@@ -825,6 +828,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      memberships: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          plan: string
+          started_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -1054,6 +1090,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_active_membership: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

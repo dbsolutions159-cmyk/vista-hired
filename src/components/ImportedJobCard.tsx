@@ -8,12 +8,13 @@ import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
-import { PremiumMembershipButton, trackCtaClick } from "@/components/JobCta";
+import { ApplyNowButton, PremiumMembershipButton, trackCtaClick } from "@/components/JobCta";
 import { ShareJobMenu } from "@/components/ShareJobMenu";
 import { hiresetuExternalJobUrl } from "@/lib/share";
 
 
-export type ImportedJob = Tables<"external_jobs">;
+/** Imported job as exposed publicly — the apply URL stays server-side. */
+export type ImportedJob = Omit<Tables<"external_jobs">, "apply_url">;
 
 const empLabels: Record<string, string> = {
   full_time: "Full-time",
@@ -178,16 +179,7 @@ export function ImportedJobCard({ job }: { job: ImportedJob }) {
           <Flag className="h-4 w-4" />
         </Button>
         <PremiumMembershipButton source="imported_job_card" label="Premium" />
-        <Button
-          asChild
-          size="sm"
-          className="gradient-primary text-primary-foreground shadow-soft"
-          onClick={() => trackCtaClick({ cta: "apply_now", externalJobId: job.id, userId: user?.id, source: "imported_job_card" })}
-        >
-          <a href={job.apply_url} target="_blank" rel="noopener noreferrer">
-            Apply Now <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-          </a>
-        </Button>
+        <ApplyNowButton externalJobId={job.id} source="imported_job_card" />
       </div>
     </Card>
   );
