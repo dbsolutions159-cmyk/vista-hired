@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PremiumMembershipButton, trackCtaClick } from "@/components/JobCta";
 import { ShareJobMenu } from "@/components/ShareJobMenu";
 import { SHARE_BANNER_URL, SITE_URL, hiresetuExternalJobUrl } from "@/lib/share";
+import { EXTERNAL_JOB_COLUMNS } from "@/lib/jobs";
 
 const empLabels: Record<string, string> = {
   full_time: "Full-time",

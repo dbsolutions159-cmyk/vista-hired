@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import type { Job } from "@/lib/jobs";
-import { employmentTypeLabels, workTypeLabels } from "@/lib/jobs";
+import { employmentTypeLabels, workTypeLabels, JOB_COLUMNS } from "@/lib/jobs";
 
 export const Route = createFileRoute("/_authenticated/admin/jobs")({
   component: AdminJobs,

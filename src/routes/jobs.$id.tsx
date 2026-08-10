@@ -2,7 +2,7 @@ import { createFileRoute, Link, useParams, notFound } from "@tanstack/react-rout
 import { useEffect } from "react";
 import { ArrowLeft, Building2, MapPin, Briefcase } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { employmentTypeLabels, formatSalary, timeAgo, workTypeLabels } from "@/lib/jobs";
+import { employmentTypeLabels, formatSalary, timeAgo, workTypeLabels, JOB_COLUMNS } from "@/lib/jobs";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { ApplyNowButton, PremiumMembershipButton } from "@/components/JobCta";

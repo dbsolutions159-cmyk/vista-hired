@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { timeAgo } from "@/lib/jobs";
+import { timeAgo, JOB_COLUMNS } from "@/lib/jobs";
 
 export const Route = createFileRoute("/_authenticated/admin/submissions")({
   component: Submissions,
