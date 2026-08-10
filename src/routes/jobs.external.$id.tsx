@@ -50,7 +50,7 @@ export const Route = createFileRoute("/jobs/external/$id")({
   loader: async ({ params }) => {
     const { data, error } = await supabase
       .from("external_jobs")
-      .select("*")
+      .select(EXTERNAL_JOB_COLUMNS)
       .eq("id", params.id)
       .maybeSingle();
     if (error) throw error;

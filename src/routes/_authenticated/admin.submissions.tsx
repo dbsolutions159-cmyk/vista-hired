@@ -33,7 +33,7 @@ function Submissions() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("jobs")
-        .select("*, job_contacts(hr_name, hr_email, hr_phone)")
+        .select(`${JOB_COLUMNS}, job_contacts(hr_name, hr_email, hr_phone)`)
 
         .neq("poster_role", "admin")
         .eq("status", status as any)

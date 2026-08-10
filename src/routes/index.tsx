@@ -67,7 +67,7 @@ async function fetchImportedPage(params: { q: string; location: string; filter: 
   const from = params.page * PAGE_SIZE;
   let query = supabase
     .from("external_jobs")
-    .select("*")
+    .select(EXTERNAL_JOB_COLUMNS)
     .eq("is_active", true)
     .order("published_at", { ascending: false })
     .range(from, from + PAGE_SIZE - 1);
@@ -141,8 +141,9 @@ function HomePage() {
     queryFn: async (): Promise<Job[]> => {
       const { data, error } = await supabase
         .from("jobs")
-        .select("*")
+        .select(JOB_COLUMNS)
         .eq("status", "live")
+        .is("deleted_at", null)
         .order("created_at", { ascending: false })
         .limit(50);
       if (error) throw error;

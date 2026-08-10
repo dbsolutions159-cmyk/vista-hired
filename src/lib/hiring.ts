@@ -1,11 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
+import { JOB_COLUMNS } from "@/lib/jobs";
 
 export const APPLICATION_SELECT =
   "*, jobs!inner(id, title, company_name, location, poster_user_id, status)";
 
 /** Jobs the current user manages (own postings, or everything for admins). */
 export async function fetchManagedJobs(userId: string, isAdmin: boolean) {
-  let q = supabase.from("jobs").select("*").order("created_at", { ascending: false });
+  let q = supabase.from("jobs").select(JOB_COLUMNS).is("deleted_at", null).order("created_at", { ascending: false });
   if (!isAdmin) q = q.eq("poster_user_id", userId);
   const { data, error } = await q;
   if (error) throw error;

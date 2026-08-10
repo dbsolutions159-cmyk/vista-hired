@@ -19,7 +19,8 @@ export const Route = createFileRoute("/jobs/$id")({
   loader: async ({ params }) => {
     const { data, error } = await supabase
       .from("jobs")
-      .select("*")
+      .select(JOB_COLUMNS)
+      .is("deleted_at", null)
       .eq("id", params.id)
       .maybeSingle();
     if (error) throw error;

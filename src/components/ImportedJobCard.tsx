@@ -13,7 +13,8 @@ import { ShareJobMenu } from "@/components/ShareJobMenu";
 import { hiresetuExternalJobUrl } from "@/lib/share";
 
 
-export type ImportedJob = Tables<"external_jobs">;
+/** Imported job as exposed publicly — the apply URL stays server-side. */
+export type ImportedJob = Omit<Tables<"external_jobs">, "apply_url">;
 
 const empLabels: Record<string, string> = {
   full_time: "Full-time",
