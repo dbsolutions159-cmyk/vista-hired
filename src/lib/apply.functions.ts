@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { logAccess, readApplyAccess } from "@/lib/trial.functions";
 
 /** Fallback destination for HireSetu jobs that have no custom apply URL. */
 export const CANDIDATE_PORTAL_URL = "https://hiresetu-candidate-portal.lovable.app";
@@ -18,8 +19,8 @@ export type ResolveApplyResult =
 
 /**
  * Releases the real application URL ONLY to a signed-in user with an active
- * membership. Non-members never receive the URL in any payload, so the lock
- * cannot be bypassed by reading page source or calling the API directly.
+ * paid membership OR an active 3-day free trial. Both are re-verified here
+ * against database time, so the lock cannot be bypassed from the browser.
  */
 export const resolveApplyUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -27,10 +28,16 @@ export const resolveApplyUrl = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<ResolveApplyResult> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: active } = await supabaseAdmin.rpc("has_active_membership", {
-      _user_id: context.userId,
+    const access = await readApplyAccess(context.userId);
+    if (!access.canApply) {
+      await logAccess(context.userId, "apply_access_denied", { ...data, reason: "no_active_access" });
+      return { ok: false, reason: "membership_required" };
+    }
+    await logAccess(context.userId, "apply_access_granted", {
+      ...data,
+      via: access.membershipActive ? "membership" : "trial",
     });
-    if (!active) return { ok: false, reason: "membership_required" };
+
 
     if (data.jobId) {
       const { data: job } = await supabaseAdmin
