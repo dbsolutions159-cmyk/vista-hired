@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { SUBSCRIPTION_URL } from "@/components/SubscriptionButtons";
-import { premiumUrlWithReturn, useMembership } from "@/lib/membership";
+import { premiumUrlWithReturn, useApplyAccess } from "@/lib/membership";
 import { resolveApplyUrl } from "@/lib/apply.functions";
 
 export const CANDIDATE_PORTAL_URL = "https://hiresetu-candidate-portal.lovable.app";
@@ -162,7 +162,8 @@ export function ApplyNowButton({
       } else {
         tab?.close();
         if (res.reason === "membership_required") {
-          toast.error("Your membership is no longer active");
+          void refresh();
+          toast.error("Your free trial has ended \u2014 membership required to apply");
           goPremium();
         } else if (res.reason === "closed") toast.error("Applications for this job are closed");
         else toast.error("This job is no longer available");
@@ -184,6 +185,11 @@ export function ApplyNowButton({
     >
       {unlocking ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-1.5 h-4 w-4" />}
       Apply Now
+      {trialActive ? (
+        <span className="ml-1.5 hidden rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold sm:inline">
+          Free trial \u00b7 {daysRemaining}d
+        </span>
+      ) : null}
     </Button>
   );
 }
