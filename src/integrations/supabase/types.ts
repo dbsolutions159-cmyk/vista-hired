@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_audit_logs: {
+        Row: {
+          created_at: string
+          detail: Json | null
+          event: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          detail?: Json | null
+          event: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          detail?: Json | null
+          event?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       application_events: {
         Row: {
           actor_id: string | null
@@ -151,6 +175,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      apply_trials: {
+        Row: {
+          created_at: string
+          trial_end_at: string
+          trial_start_at: string
+          trial_status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          trial_end_at?: string
+          trial_start_at?: string
+          trial_status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          trial_end_at?: string
+          trial_start_at?: string
+          trial_status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       candidate_education: {
         Row: {
@@ -1090,7 +1141,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_access_state: { Args: { _user_id: string }; Returns: Json }
+      expire_due_trials: { Args: never; Returns: undefined }
       has_active_membership: { Args: { _user_id: string }; Returns: boolean }
+      has_active_trial: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

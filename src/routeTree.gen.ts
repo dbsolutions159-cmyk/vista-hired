@@ -31,6 +31,7 @@ import { Route as AuthenticatedAdminSubmissionsRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminJobsRouteImport } from './routes/_authenticated/admin.jobs'
 import { Route as AuthenticatedAdminImportsRouteImport } from './routes/_authenticated/admin.imports'
 import { Route as AuthenticatedAdminApplicationsRouteImport } from './routes/_authenticated/admin.applications'
+import { Route as AuthenticatedAdminAccessRouteImport } from './routes/_authenticated/admin.access'
 import { Route as ApiPublicHooksSyncJobsRouteImport } from './routes/api/public/hooks/sync-jobs'
 import { Route as AuthenticatedHiringCandidatesAppIdRouteImport } from './routes/_authenticated/hiring.candidates.$appId'
 import { Route as AuthenticatedAdminApplicationsIdRouteImport } from './routes/_authenticated/admin.applications.$id'
@@ -152,6 +153,12 @@ const AuthenticatedAdminApplicationsRoute =
     path: '/applications',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminAccessRoute =
+  AuthenticatedAdminAccessRouteImport.update({
+    id: '/access',
+    path: '/access',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const ApiPublicHooksSyncJobsRoute = ApiPublicHooksSyncJobsRouteImport.update({
   id: '/api/public/hooks/sync-jobs',
   path: '/api/public/hooks/sync-jobs',
@@ -179,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/hiring': typeof AuthenticatedHiringRouteWithChildren
   '/profile': typeof AuthenticatedProfileRouteWithChildren
   '/jobs/$id': typeof JobsIdRoute
+  '/admin/access': typeof AuthenticatedAdminAccessRoute
   '/admin/applications': typeof AuthenticatedAdminApplicationsRouteWithChildren
   '/admin/imports': typeof AuthenticatedAdminImportsRoute
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
@@ -202,6 +210,7 @@ export interface FileRoutesByTo {
   '/post-job': typeof PostJobRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/jobs/$id': typeof JobsIdRoute
+  '/admin/access': typeof AuthenticatedAdminAccessRoute
   '/admin/applications': typeof AuthenticatedAdminApplicationsRouteWithChildren
   '/admin/imports': typeof AuthenticatedAdminImportsRoute
   '/admin/jobs': typeof AuthenticatedAdminJobsRoute
@@ -230,6 +239,7 @@ export interface FileRoutesById {
   '/_authenticated/hiring': typeof AuthenticatedHiringRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRouteWithChildren
   '/jobs/$id': typeof JobsIdRoute
+  '/_authenticated/admin/access': typeof AuthenticatedAdminAccessRoute
   '/_authenticated/admin/applications': typeof AuthenticatedAdminApplicationsRouteWithChildren
   '/_authenticated/admin/imports': typeof AuthenticatedAdminImportsRoute
   '/_authenticated/admin/jobs': typeof AuthenticatedAdminJobsRoute
@@ -258,6 +268,7 @@ export interface FileRouteTypes {
     | '/hiring'
     | '/profile'
     | '/jobs/$id'
+    | '/admin/access'
     | '/admin/applications'
     | '/admin/imports'
     | '/admin/jobs'
@@ -281,6 +292,7 @@ export interface FileRouteTypes {
     | '/post-job'
     | '/sitemap.xml'
     | '/jobs/$id'
+    | '/admin/access'
     | '/admin/applications'
     | '/admin/imports'
     | '/admin/jobs'
@@ -308,6 +320,7 @@ export interface FileRouteTypes {
     | '/_authenticated/hiring'
     | '/_authenticated/profile'
     | '/jobs/$id'
+    | '/_authenticated/admin/access'
     | '/_authenticated/admin/applications'
     | '/_authenticated/admin/imports'
     | '/_authenticated/admin/jobs'
@@ -493,6 +506,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminApplicationsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/access': {
+      id: '/_authenticated/admin/access'
+      path: '/access'
+      fullPath: '/admin/access'
+      preLoaderRoute: typeof AuthenticatedAdminAccessRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/api/public/hooks/sync-jobs': {
       id: '/api/public/hooks/sync-jobs'
       path: '/api/public/hooks/sync-jobs'
@@ -533,6 +553,7 @@ const AuthenticatedAdminApplicationsRouteWithChildren =
   )
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAccessRoute: typeof AuthenticatedAdminAccessRoute
   AuthenticatedAdminApplicationsRoute: typeof AuthenticatedAdminApplicationsRouteWithChildren
   AuthenticatedAdminImportsRoute: typeof AuthenticatedAdminImportsRoute
   AuthenticatedAdminJobsRoute: typeof AuthenticatedAdminJobsRoute
@@ -541,6 +562,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAccessRoute: AuthenticatedAdminAccessRoute,
   AuthenticatedAdminApplicationsRoute:
     AuthenticatedAdminApplicationsRouteWithChildren,
   AuthenticatedAdminImportsRoute: AuthenticatedAdminImportsRoute,
@@ -615,3 +637,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

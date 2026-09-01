@@ -1,4 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getApplyAccess } from "@/lib/trial.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { SUBSCRIPTION_URL } from "@/components/SubscriptionButtons";
@@ -53,5 +55,45 @@ export function useMembership() {
     membership: q.data ?? null,
     isActive: state === "active",
     loading: loading || (!!user && q.isLoading),
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Server-verified apply access (paid membership OR 3-day free trial)  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Reads the server's verdict on Apply access. The browser never decides:
+ * trial expiry is evaluated against database time on every call.
+ */
+export function useApplyAccess() {
+  const { user, loading } = useAuth();
+  const fetchAccess = useServerFn(getApplyAccess);
+
+  const q = useQuery({
+    enabled: !!user,
+    queryKey: ["apply-access", user?.id],
+    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+    queryFn: () => fetchAccess({ data: undefined as never }),
+  });
+
+  const a = q.data ?? null;
+  const daysRemaining =
+    a?.trialActive && a.trial
+      ? Math.max(0, Math.ceil((new Date(a.trial.trial_end_at).getTime() - new Date(a.now).getTime()) / 86_400_000))
+      : 0;
+
+  return {
+    access: a,
+    canApply: !!a?.canApply,
+    membershipActive: !!a?.membershipActive,
+    trialActive: !!a?.trialActive,
+    trialExpired: a?.trial?.trial_status === "expired",
+    trialEndsAt: a?.trial?.trial_end_at ?? null,
+    trialStartedAt: a?.trial?.trial_start_at ?? null,
+    daysRemaining,
+    loading: loading || (!!user && q.isLoading),
+    refresh: q.refetch,
   };
 }

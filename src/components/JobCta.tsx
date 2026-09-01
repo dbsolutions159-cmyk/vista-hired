@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { SUBSCRIPTION_URL } from "@/components/SubscriptionButtons";
-import { premiumUrlWithReturn, useMembership } from "@/lib/membership";
+import { premiumUrlWithReturn, useApplyAccess } from "@/lib/membership";
 import { resolveApplyUrl } from "@/lib/apply.functions";
 
 export const CANDIDATE_PORTAL_URL = "https://hiresetu-candidate-portal.lovable.app";
@@ -99,7 +99,7 @@ export function ApplyNowButton({
   fullWidth?: boolean;
 }) {
   const { user } = useAuth();
-  const { state, loading } = useMembership();
+  const { canApply, trialActive, daysRemaining, loading, refresh } = useApplyAccess();
   const applied = useHasApplied(jobId);
   const [unlocking, setUnlocking] = useState(false);
   const resolve = useServerFn(resolveApplyUrl);
@@ -122,6 +122,8 @@ export function ApplyNowButton({
 
   const goPremium = () => {
     trackCtaClick({ cta: "unlock_apply", jobId, externalJobId, userId: user?.id, source });
+    // Only the safe public HireSetu URL is carried across, never any
+    // client-side "already paid" flag — membership is re-verified server-side.
     window.open(
       premiumUrlWithReturn(typeof window !== "undefined" ? window.location.href : undefined),
       "_blank",
@@ -129,21 +131,21 @@ export function ApplyNowButton({
     );
   };
 
-  // Visitor, non-member and expired states all keep the URL hidden.
-  if (state !== "active") {
-    const label = state === "expired" ? "Renew to Apply" : "Apply Now";
+  // Visitor, non-member and expired trial all keep the URL hidden.
+  if (!canApply) {
     return (
       <Button
         size={size}
         onClick={goPremium}
-        title="Membership required to apply"
+        title="Free trial ended · Membership required to apply"
         className={`gradient-primary text-primary-foreground shadow-soft ${width} ${className}`}
       >
         {loading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Lock className="mr-1.5 h-4 w-4" />}
-        {label}
+        Unlock Apply
       </Button>
     );
   }
+
 
   const unlockAndApply = async () => {
     setUnlocking(true);
@@ -160,7 +162,8 @@ export function ApplyNowButton({
       } else {
         tab?.close();
         if (res.reason === "membership_required") {
-          toast.error("Your membership is no longer active");
+          void refresh();
+          toast.error("Your free trial has ended \u2014 membership required to apply");
           goPremium();
         } else if (res.reason === "closed") toast.error("Applications for this job are closed");
         else toast.error("This job is no longer available");
@@ -182,6 +185,11 @@ export function ApplyNowButton({
     >
       {unlocking ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-1.5 h-4 w-4" />}
       Apply Now
+      {trialActive ? (
+        <span className="ml-1.5 hidden rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold sm:inline">
+          Free trial \u00b7 {daysRemaining}d
+        </span>
+      ) : null}
     </Button>
   );
 }
