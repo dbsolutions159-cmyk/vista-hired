@@ -99,7 +99,7 @@ export function ApplyNowButton({
   fullWidth?: boolean;
 }) {
   const { user } = useAuth();
-  const { state, loading } = useMembership();
+  const { canApply, trialActive, daysRemaining, loading, refresh } = useApplyAccess();
   const applied = useHasApplied(jobId);
   const [unlocking, setUnlocking] = useState(false);
   const resolve = useServerFn(resolveApplyUrl);
@@ -122,6 +122,8 @@ export function ApplyNowButton({
 
   const goPremium = () => {
     trackCtaClick({ cta: "unlock_apply", jobId, externalJobId, userId: user?.id, source });
+    // Only the safe public HireSetu URL is carried across, never any
+    // client-side "already paid" flag — membership is re-verified server-side.
     window.open(
       premiumUrlWithReturn(typeof window !== "undefined" ? window.location.href : undefined),
       "_blank",
@@ -129,21 +131,21 @@ export function ApplyNowButton({
     );
   };
 
-  // Visitor, non-member and expired states all keep the URL hidden.
-  if (state !== "active") {
-    const label = state === "expired" ? "Renew to Apply" : "Apply Now";
+  // Visitor, non-member and expired trial all keep the URL hidden.
+  if (!canApply) {
     return (
       <Button
         size={size}
         onClick={goPremium}
-        title="Membership required to apply"
+        title="Free trial ended · Membership required to apply"
         className={`gradient-primary text-primary-foreground shadow-soft ${width} ${className}`}
       >
         {loading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Lock className="mr-1.5 h-4 w-4" />}
-        {label}
+        Unlock Apply
       </Button>
     );
   }
+
 
   const unlockAndApply = async () => {
     setUnlocking(true);
