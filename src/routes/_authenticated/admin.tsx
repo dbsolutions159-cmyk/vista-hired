@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router";
-import { BarChart3, Briefcase, ClipboardCheck, FileText, PlugZap, ShieldAlert } from "lucide-react";
+import { BarChart3, Briefcase, ClipboardCheck, FileText, PlugZap, ShieldAlert, KeyRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
@@ -27,6 +27,7 @@ function AdminLayout() {
           <Button asChild variant="ghost" size="sm" className="rounded-full"><Link to="/admin/jobs"><Briefcase className="mr-1.5 h-4 w-4" />Jobs</Link></Button>
           <Button asChild variant="ghost" size="sm" className="rounded-full"><Link to="/admin/applications"><FileText className="mr-1.5 h-4 w-4" />Applications</Link></Button>
           <Button asChild variant="ghost" size="sm" className="rounded-full"><Link to="/admin/imports"><PlugZap className="mr-1.5 h-4 w-4" />Imports</Link></Button>
+          <Button asChild variant="ghost" size="sm" className="rounded-full"><Link to="/admin/access"><KeyRound className="mr-1.5 h-4 w-4" />Access</Link></Button>
         </nav>
       </div>
       <Outlet />

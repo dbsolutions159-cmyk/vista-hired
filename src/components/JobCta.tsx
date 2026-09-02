@@ -163,7 +163,7 @@ export function ApplyNowButton({
         tab?.close();
         if (res.reason === "membership_required") {
           void refresh();
-          toast.error("Your free trial has ended \u2014 membership required to apply");
+          toast.error("Your free trial has ended — membership required to apply");
           goPremium();
         } else if (res.reason === "closed") toast.error("Applications for this job are closed");
         else toast.error("This job is no longer available");
@@ -187,7 +187,7 @@ export function ApplyNowButton({
       Apply Now
       {trialActive ? (
         <span className="ml-1.5 hidden rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold sm:inline">
-          Free trial \u00b7 {daysRemaining}d
+          Free trial · {daysRemaining}d
         </span>
       ) : null}
     </Button>

@@ -14,6 +14,7 @@ import { timeAgo } from "@/lib/jobs";
 import { CompletionRing } from "@/components/CompletionRing";
 import { computeCompletionDetail } from "@/lib/profile-completion";
 import { ShareSubscriptionButton, SubscriptionButton } from "@/components/SubscriptionButtons";
+import { TrialStatusCard } from "@/components/TrialStatusCard";
 
 export const Route = createFileRoute("/_authenticated/profile/")({
   component: ProfilePage,
@@ -115,6 +116,7 @@ function ProfilePage() {
             <SubscriptionButton />
             <ShareSubscriptionButton />
           </div>
+          <TrialStatusCard className="mt-4" />
         </div>
       </Card>
 
