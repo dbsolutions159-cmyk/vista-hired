@@ -1,15 +1,27 @@
 import { useServerFn } from "@tanstack/react-start";
-import { Crown, CheckCircle2, Lock, Loader2 } from "lucide-react";
+import {
+  Crown,
+  CheckCircle2,
+  Lock,
+  Loader2,
+  ArrowRight,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { SUBSCRIPTION_URL } from "@/components/SubscriptionButtons";
-import { premiumUrlWithReturn, useApplyAccess } from "@/lib/membership";
+import {
+  premiumUrlWithReturn,
+  useApplyAccess,
+} from "@/lib/membership";
 import { resolveApplyUrl } from "@/lib/apply.functions";
+import { SmartApplicationForm } from "@/components/SmartApplicationForm";
 
-export const CANDIDATE_PORTAL_URL = "https://hiresetu-candidate-portal.lovable.app";
+export const CANDIDATE_PORTAL_URL =
+  "https://hiresetu-candidate-portal.lovable.app";
 
 type CtaKind =
   | "apply_now"
@@ -19,7 +31,6 @@ type CtaKind =
   | "share_job"
   | "view_job";
 
-/** Fire-and-forget CTA click tracking. Never blocks navigation. */
 export function trackCtaClick(opts: {
   cta: CtaKind;
   jobId?: string | null;
@@ -39,49 +50,68 @@ export function trackCtaClick(opts: {
       })
       .then(() => {});
   } catch {
-    /* tracking must never break the CTA */
+    // Tracking must never break CTA behaviour.
   }
 }
 
 /**
- * Reliable "already applied" check: only true when a row exists in our own
- * applications table for this user + job. Opening the external candidate
- * portal never sets this. Architecture is ready for future portal sync —
- * the portal only needs to write an applications row for the same job id.
+ * Checks whether this logged-in candidate has already submitted
+ * an application for this HireSetu job.
  */
 export function useHasApplied(jobId?: string | null) {
   const { user } = useAuth();
   const [applied, setApplied] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     let active = true;
+
     if (!user || !jobId) {
       setApplied(false);
+      setChecking(false);
       return;
     }
-    supabase
+
+    setChecking(true);
+
+    void supabase
       .from("applications")
       .select("id")
       .eq("job_id", jobId)
       .eq("user_id", user.id)
       .maybeSingle()
       .then(({ data }) => {
-        if (active) setApplied(!!data);
+        if (!active) return;
+
+        setApplied(Boolean(data));
+        setChecking(false);
       });
+
     return () => {
       active = false;
     };
   }, [user, jobId]);
 
-  return applied;
+  return {
+    applied,
+    checking,
+  };
 }
 
 /**
- * Membership-gated apply button.
+ * Main Apply CTA.
  *
- * The destination URL is NEVER rendered for non-members — it is fetched from
- * the server only after it re-verifies an active membership, so the lock
- * cannot be bypassed from the browser.
+ * INTERNAL HIRESETU JOB
+ *   membership/trial
+ *      ↓
+ *   Smart Application Form
+ *
+ * EXTERNAL JOB
+ *   membership/trial
+ *      ↓
+ *   resolveApplyUrl()
+ *      ↓
+ *   official company application URL
  */
 export function ApplyNowButton({
   jobId,
@@ -99,14 +129,38 @@ export function ApplyNowButton({
   fullWidth?: boolean;
 }) {
   const { user } = useAuth();
-  const { canApply, trialActive, daysRemaining, loading, refresh } = useApplyAccess();
-  const applied = useHasApplied(jobId);
+
+  const {
+    canApply,
+    trialActive,
+    daysRemaining,
+    loading,
+    refresh,
+  } = useApplyAccess();
+
+  const { applied, checking } = useHasApplied(jobId);
+
   const [unlocking, setUnlocking] = useState(false);
+  const [showApplicationForm, setShowApplicationForm] =
+    useState(false);
+
   const resolve = useServerFn(resolveApplyUrl);
 
   const width = fullWidth ? "w-full" : "";
 
-  if (applied) {
+  /**
+   * External/API jobs don't use Smart Application.
+   *
+   * If externalJobId exists and there is no internal jobId,
+   * this is an external job.
+   */
+  const isExternalJob =
+    Boolean(externalJobId) && !Boolean(jobId);
+
+  /**
+   * Already applied.
+   */
+  if (applied && !isExternalJob) {
     return (
       <Button
         size={size}
@@ -120,29 +174,48 @@ export function ApplyNowButton({
     );
   }
 
+  /**
+   * Premium destination.
+   */
   const goPremium = () => {
-    trackCtaClick({ cta: "unlock_apply", jobId, externalJobId, userId: user?.id, source });
-    // Only the safe public HireSetu URL is carried across, never any
-    // client-side "already paid" flag — membership is re-verified server-side.
+    trackCtaClick({
+      cta: "unlock_apply",
+      jobId,
+      externalJobId,
+      userId: user?.id,
+      source,
+    });
+
     window.open(
-      premiumUrlWithReturn(typeof window !== "undefined" ? window.location.href : undefined),
+      premiumUrlWithReturn(
+        typeof window !== "undefined"
+          ? window.location.href
+          : undefined,
+      ),
       "_blank",
       "noopener,noreferrer",
     );
   };
 
-  // While the server verdict is in flight for a signed-in user, show a neutral
-  // pending state instead of falsely claiming the trial has ended.
-  if (loading) {
+  /**
+   * Access still loading.
+   */
+  if (loading || checking) {
     return (
-      <Button size={size} disabled className={`gradient-primary text-primary-foreground shadow-soft ${width} ${className}`}>
+      <Button
+        size={size}
+        disabled
+        className={`gradient-primary text-primary-foreground shadow-soft ${width} ${className}`}
+      >
         <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
         Apply Now
       </Button>
     );
   }
 
-  // Visitor, non-member and expired trial all keep the URL hidden.
+  /**
+   * No active trial / membership.
+   */
   if (!canApply) {
     return (
       <Button
@@ -157,47 +230,175 @@ export function ApplyNowButton({
     );
   }
 
+  /**
+   * Successful Smart Application submission.
+   */
+  const handleApplicationSuccess = () => {
+    setShowApplicationForm(false);
 
+    toast.success("Application submitted successfully");
 
-  const unlockAndApply = async () => {
+    // Refresh access + applied state consumers.
+    void refresh();
+  };
+
+  /**
+   * INTERNAL JOB
+   *
+   * Do NOT redirect to candidate portal.
+   * Open Smart Application inside HireSetu.
+   */
+  const openSmartApplication = () => {
+    if (!jobId) {
+      toast.error("Job information is missing");
+      return;
+    }
+
+    trackCtaClick({
+      cta: "apply_now",
+      jobId,
+      userId: user?.id,
+      source,
+    });
+
+    setShowApplicationForm(true);
+  };
+
+  /**
+   * EXTERNAL JOB
+   *
+   * Preserve the existing official-company Apply flow.
+   */
+  const openExternalApplication = async () => {
+    if (!externalJobId) {
+      toast.error("Application information is missing");
+      return;
+    }
+
     setUnlocking(true);
-    // Open synchronously so the browser doesn't treat this as a popup.
-    const tab = window.open("", "_blank", "noopener,noreferrer");
+
+    const tab = window.open(
+      "",
+      "_blank",
+      "noopener,noreferrer",
+    );
+
     try {
-      trackCtaClick({ cta: "apply_now", jobId, externalJobId, userId: user?.id, source });
-      const res = await resolve({
-        data: jobId ? { jobId } : { externalJobId: externalJobId! },
+      trackCtaClick({
+        cta: "apply_now",
+        externalJobId,
+        userId: user?.id,
+        source,
       });
+
+      const res = await resolve({
+        data: {
+          externalJobId,
+        },
+      });
+
       if (res.ok) {
-        if (tab) tab.location.href = res.url;
-        else window.open(res.url, "_blank", "noopener,noreferrer");
+        if (tab) {
+          tab.location.href = res.url;
+        } else {
+          window.open(
+            res.url,
+            "_blank",
+            "noopener,noreferrer",
+          );
+        }
+
+        return;
+      }
+
+      tab?.close();
+
+      if (res.reason === "membership_required") {
+        void refresh();
+
+        toast.error(
+          "Your free trial has ended — membership required to apply",
+        );
+
+        goPremium();
+      } else if (res.reason === "closed") {
+        toast.error(
+          "Applications for this job are closed",
+        );
       } else {
-        tab?.close();
-        if (res.reason === "membership_required") {
-          void refresh();
-          toast.error("Your free trial has ended — membership required to apply");
-          goPremium();
-        } else if (res.reason === "closed") toast.error("Applications for this job are closed");
-        else toast.error("This job is no longer available");
+        toast.error(
+          "This job is no longer available",
+        );
       }
     } catch {
       tab?.close();
-      toast.error("Couldn't open the application page");
+
+      toast.error(
+        "Couldn't open the application page",
+      );
     } finally {
       setUnlocking(false);
     }
   };
 
+  /**
+   * Smart Application UI.
+   *
+   * We render it directly underneath the CTA instead of navigating
+   * away from the HireSetu job page.
+   */
+  if (showApplicationForm && jobId && !isExternalJob) {
+    return (
+      <div className={width}>
+        <SmartApplicationForm
+          jobId={jobId}
+          onSuccess={handleApplicationSuccess}
+        />
+
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="mt-2 w-full"
+          onClick={() =>
+            setShowApplicationForm(false)
+          }
+        >
+          Cancel Application
+        </Button>
+      </div>
+    );
+  }
+
+  /**
+   * Main CTA.
+   */
   return (
     <Button
       size={size}
       disabled={unlocking}
-      onClick={() => void unlockAndApply()}
+      onClick={() => {
+        if (isExternalJob) {
+          void openExternalApplication();
+        } else {
+          openSmartApplication();
+        }
+      }}
       className={`gradient-primary text-primary-foreground shadow-soft ${width} ${className}`}
     >
-      {unlocking ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-1.5 h-4 w-4" />}
-      Apply Now
-      {trialActive ? (
+      {unlocking ? (
+        <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+      ) : (
+        <CheckCircle2 className="mr-1.5 h-4 w-4" />
+      )}
+
+      {isExternalJob
+        ? "Apply on Company Site"
+        : "Apply Now"}
+
+      {isExternalJob ? (
+        <ArrowRight className="ml-1.5 h-4 w-4" />
+      ) : trialActive ? (
         <span className="ml-1.5 hidden rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold sm:inline">
           Free trial · {daysRemaining}d
         </span>
@@ -222,18 +423,28 @@ export function PremiumMembershipButton({
   label?: string;
 }) {
   const { user } = useAuth();
+
   return (
     <Button
       asChild
       size={size}
       variant="outline"
-      className={`border-amber-500/50 bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 dark:text-amber-400 ${fullWidth ? "w-full" : ""} ${className}`}
+      className={`border-amber-500/50 bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 dark:text-amber-400 ${
+        fullWidth ? "w-full" : ""
+      } ${className}`}
     >
       <a
         href={SUBSCRIPTION_URL}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={() => trackCtaClick({ cta: "premium_membership", jobId, userId: user?.id, source })}
+        onClick={() =>
+          trackCtaClick({
+            cta: "premium_membership",
+            jobId,
+            userId: user?.id,
+            source,
+          })
+        }
       >
         <Crown className="mr-1.5 h-4 w-4" />
         {label}
@@ -242,7 +453,9 @@ export function PremiumMembershipButton({
   );
 }
 
-/** Side-by-side CTA row used on cards and job details. */
+/**
+ * Side-by-side CTA row.
+ */
 export function JobCtaRow({
   jobId,
   externalJobId,
@@ -257,9 +470,21 @@ export function JobCtaRow({
   className?: string;
 }) {
   return (
-    <div className={`flex flex-wrap items-center gap-2 ${className}`}>
-      <ApplyNowButton jobId={jobId} externalJobId={externalJobId} size={size} source={source} />
-      <PremiumMembershipButton jobId={jobId} size={size} source={source} />
+    <div
+      className={`flex flex-wrap items-center gap-2 ${className}`}
+    >
+      <ApplyNowButton
+        jobId={jobId}
+        externalJobId={externalJobId}
+        size={size}
+        source={source}
+      />
+
+      <PremiumMembershipButton
+        jobId={jobId}
+        size={size}
+        source={source}
+      />
     </div>
   );
 }
