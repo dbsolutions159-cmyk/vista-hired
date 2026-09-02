@@ -133,7 +133,7 @@ export function ApplyNowButton({
 
   // While the server verdict is in flight for a signed-in user, show a neutral
   // pending state instead of falsely claiming the trial has ended.
-  if (user && loading) {
+  if (loading) {
     return (
       <Button size={size} disabled className={`gradient-primary text-primary-foreground shadow-soft ${width} ${className}`}>
         <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
