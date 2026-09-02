@@ -131,20 +131,32 @@ export function ApplyNowButton({
     );
   };
 
+  // While the server verdict is in flight for a signed-in user, show a neutral
+  // pending state instead of falsely claiming the trial has ended.
+  if (user && loading) {
+    return (
+      <Button size={size} disabled className={`gradient-primary text-primary-foreground shadow-soft ${width} ${className}`}>
+        <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+        Apply Now
+      </Button>
+    );
+  }
+
   // Visitor, non-member and expired trial all keep the URL hidden.
   if (!canApply) {
     return (
       <Button
         size={size}
         onClick={goPremium}
-        title="Free trial ended · Membership required to apply"
+        title="Membership required to apply"
         className={`gradient-primary text-primary-foreground shadow-soft ${width} ${className}`}
       >
-        {loading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Lock className="mr-1.5 h-4 w-4" />}
+        <Lock className="mr-1.5 h-4 w-4" />
         Unlock Apply
       </Button>
     );
   }
+
 
 
   const unlockAndApply = async () => {
