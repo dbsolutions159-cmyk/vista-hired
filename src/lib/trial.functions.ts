@@ -53,7 +53,7 @@ export const getApplyAccess = createServerFn({ method: "POST" })
 
 const adminInput = z.object({
   filter: z
-    .enum(["all", "trial_active", "trial_expired", "membership_active", "membership_expired"])
+    .enum(["all", "trial_active", "trial_expired", "membership_active", "membership_expired", "no_access"])
     .default("all"),
   search: z.string().trim().max(120).optional(),
 });
@@ -68,6 +68,7 @@ export type AccessRow = {
   membership_status: string | null;
   membership_plan: string | null;
   membership_expires_at: string | null;
+  can_apply: boolean;
 };
 
 export const listAccessOverview = createServerFn({ method: "POST" })
@@ -103,6 +104,7 @@ export const listAccessOverview = createServerFn({ method: "POST" })
         membership_status: m?.status ?? null,
         membership_plan: m?.plan ?? null,
         membership_expires_at: m?.expires_at ?? null,
+        can_apply: false,
       };
     });
 
@@ -110,6 +112,17 @@ export const listAccessOverview = createServerFn({ method: "POST" })
       r.membership_status === "active" &&
       (!r.membership_expires_at || new Date(r.membership_expires_at).getTime() > now);
 
+    rows = rows.map((r) => ({
+      ...r,
+      can_apply:
+        (r.membership_status === "active" &&
+          (!r.membership_expires_at || new Date(r.membership_expires_at).getTime() > now)) ||
+        (r.trial_status === "active" &&
+          !!r.trial_end_at &&
+          new Date(r.trial_end_at).getTime() > now),
+    }));
+
+    if (data.filter === "no_access") rows = rows.filter((r) => !r.can_apply);
     if (data.filter === "trial_active") rows = rows.filter((r) => r.trial_status === "active");
     if (data.filter === "trial_expired") rows = rows.filter((r) => r.trial_status === "expired");
     if (data.filter === "membership_active") rows = rows.filter(memberActive);
