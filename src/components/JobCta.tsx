@@ -44,7 +44,8 @@ export function trackCtaClick(opts: {
       .insert({
         cta: opts.cta,
         job_id: opts.jobId ?? null,
-        external_job_id: opts.externalJobId ?? null,
+        external_job_id:
+          opts.externalJobId ?? null,
         user_id: opts.userId ?? null,
         source: opts.source ?? null,
       })
@@ -54,14 +55,16 @@ export function trackCtaClick(opts: {
   }
 }
 
-/**
- * Checks whether this logged-in candidate has already submitted
- * an application for this HireSetu job.
- */
-export function useHasApplied(jobId?: string | null) {
+export function useHasApplied(
+  jobId?: string | null,
+) {
   const { user } = useAuth();
-  const [applied, setApplied] = useState(false);
-  const [checking, setChecking] = useState(true);
+
+  const [applied, setApplied] =
+    useState(false);
+
+  const [checking, setChecking] =
+    useState(true);
 
   useEffect(() => {
     let active = true;
@@ -98,24 +101,11 @@ export function useHasApplied(jobId?: string | null) {
   };
 }
 
-/**
- * Main Apply CTA.
- *
- * INTERNAL HIRESETU JOB
- *   membership/trial
- *      ↓
- *   Smart Application Form
- *
- * EXTERNAL JOB
- *   membership/trial
- *      ↓
- *   resolveApplyUrl()
- *      ↓
- *   official company application URL
- */
 export function ApplyNowButton({
   jobId,
   externalJobId,
+  jobTitle,
+  companyName,
   size = "sm",
   className = "",
   source,
@@ -123,6 +113,8 @@ export function ApplyNowButton({
 }: {
   jobId?: string | null;
   externalJobId?: string | null;
+  jobTitle?: string | null;
+  companyName?: string | null;
   size?: "sm" | "default" | "lg";
   className?: string;
   source?: string;
@@ -138,29 +130,33 @@ export function ApplyNowButton({
     refresh,
   } = useApplyAccess();
 
-  const { applied, checking } = useHasApplied(jobId);
+  const { applied, checking } =
+    useHasApplied(jobId);
 
-  const [unlocking, setUnlocking] = useState(false);
-  const [showApplicationForm, setShowApplicationForm] =
+  const [unlocking, setUnlocking] =
     useState(false);
 
-  const resolve = useServerFn(resolveApplyUrl);
+  const [
+    showApplicationForm,
+    setShowApplicationForm,
+  ] = useState(false);
 
-  const width = fullWidth ? "w-full" : "";
+  const resolve =
+    useServerFn(resolveApplyUrl);
 
-  /**
-   * External/API jobs don't use Smart Application.
-   *
-   * If externalJobId exists and there is no internal jobId,
-   * this is an external job.
-   */
+  const width = fullWidth
+    ? "w-full"
+    : "";
+
   const isExternalJob =
-    Boolean(externalJobId) && !Boolean(jobId);
+    Boolean(externalJobId) &&
+    !Boolean(jobId);
 
-  /**
-   * Already applied.
-   */
-  if (applied && !isExternalJob) {
+  if (
+    applied &&
+    !isExternalJob &&
+    !showApplicationForm
+  ) {
     return (
       <Button
         size={size}
@@ -174,9 +170,6 @@ export function ApplyNowButton({
     );
   }
 
-  /**
-   * Premium destination.
-   */
   const goPremium = () => {
     trackCtaClick({
       cta: "unlock_apply",
@@ -197,9 +190,6 @@ export function ApplyNowButton({
     );
   };
 
-  /**
-   * Access still loading.
-   */
   if (loading || checking) {
     return (
       <Button
@@ -213,9 +203,6 @@ export function ApplyNowButton({
     );
   }
 
-  /**
-   * No active trial / membership.
-   */
   if (!canApply) {
     return (
       <Button
@@ -230,27 +217,22 @@ export function ApplyNowButton({
     );
   }
 
-  /**
-   * Successful Smart Application submission.
-   */
-  const handleApplicationSuccess = () => {
-    setShowApplicationForm(false);
+  const handleApplicationSuccess =
+    () => {
+      setShowApplicationForm(false);
 
-    toast.success("Application submitted successfully");
+      toast.success(
+        "Application submitted successfully",
+      );
 
-    // Refresh access + applied state consumers.
-    void refresh();
-  };
+      void refresh();
+    };
 
-  /**
-   * INTERNAL JOB
-   *
-   * Do NOT redirect to candidate portal.
-   * Open Smart Application inside HireSetu.
-   */
   const openSmartApplication = () => {
     if (!jobId) {
-      toast.error("Job information is missing");
+      toast.error(
+        "Job information is missing",
+      );
       return;
     }
 
@@ -264,95 +246,109 @@ export function ApplyNowButton({
     setShowApplicationForm(true);
   };
 
-  /**
-   * EXTERNAL JOB
-   *
-   * Preserve the existing official-company Apply flow.
-   */
-  const openExternalApplication = async () => {
-    if (!externalJobId) {
-      toast.error("Application information is missing");
-      return;
-    }
-
-    setUnlocking(true);
-
-    const tab = window.open(
-      "",
-      "_blank",
-      "noopener,noreferrer",
-    );
-
-    try {
-      trackCtaClick({
-        cta: "apply_now",
-        externalJobId,
-        userId: user?.id,
-        source,
-      });
-
-      const res = await resolve({
-        data: {
-          externalJobId,
-        },
-      });
-
-      if (res.ok) {
-        if (tab) {
-          tab.location.href = res.url;
-        } else {
-          window.open(
-            res.url,
-            "_blank",
-            "noopener,noreferrer",
-          );
-        }
-
+  const openExternalApplication =
+    async () => {
+      if (!externalJobId) {
+        toast.error(
+          "Application information is missing",
+        );
         return;
       }
 
-      tab?.close();
+      setUnlocking(true);
 
-      if (res.reason === "membership_required") {
-        void refresh();
-
-        toast.error(
-          "Your free trial has ended — membership required to apply",
-        );
-
-        goPremium();
-      } else if (res.reason === "closed") {
-        toast.error(
-          "Applications for this job are closed",
-        );
-      } else {
-        toast.error(
-          "This job is no longer available",
-        );
-      }
-    } catch {
-      tab?.close();
-
-      toast.error(
-        "Couldn't open the application page",
+      const tab = window.open(
+        "",
+        "_blank",
+        "noopener,noreferrer",
       );
-    } finally {
-      setUnlocking(false);
-    }
-  };
 
-  /**
-   * Smart Application UI.
-   *
-   * We render it directly underneath the CTA instead of navigating
-   * away from the HireSetu job page.
-   */
-  if (showApplicationForm && jobId && !isExternalJob) {
+      try {
+        trackCtaClick({
+          cta: "apply_now",
+          externalJobId,
+          userId: user?.id,
+          source,
+        });
+
+        const res = await resolve({
+          data: {
+            externalJobId,
+          },
+        });
+
+        if (res.ok) {
+          if (tab) {
+            tab.location.href =
+              res.url;
+          } else {
+            window.open(
+              res.url,
+              "_blank",
+              "noopener,noreferrer",
+            );
+          }
+
+          return;
+        }
+
+        tab?.close();
+
+        if (
+          res.reason ===
+          "membership_required"
+        ) {
+          void refresh();
+
+          toast.error(
+            "Your free trial has ended — membership required to apply",
+          );
+
+          goPremium();
+        } else if (
+          res.reason === "closed"
+        ) {
+          toast.error(
+            "Applications for this job are closed",
+          );
+        } else {
+          toast.error(
+            "This job is no longer available",
+          );
+        }
+      } catch {
+        tab?.close();
+
+        toast.error(
+          "Couldn't open the application page",
+        );
+      } finally {
+        setUnlocking(false);
+      }
+    };
+
+  if (
+    showApplicationForm &&
+    jobId &&
+    !isExternalJob
+  ) {
     return (
-      <div className={width}>
+      <div
+        className={`w-full ${width}`}
+      >
         <SmartApplicationForm
           jobId={jobId}
-          onSuccess={handleApplicationSuccess}
+          jobTitle={
+            jobTitle ||
+            "Job Application"
+          }
+          companyName={
+            companyName ||
+            "Company"
+          }
+          onSuccess={
+            handleApplicationSuccess
+          }
         />
 
         <Button
@@ -370,9 +366,6 @@ export function ApplyNowButton({
     );
   }
 
-  /**
-   * Main CTA.
-   */
   return (
     <Button
       size={size}
@@ -400,7 +393,8 @@ export function ApplyNowButton({
         <ArrowRight className="ml-1.5 h-4 w-4" />
       ) : trialActive ? (
         <span className="ml-1.5 hidden rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold sm:inline">
-          Free trial · {daysRemaining}d
+          Free trial ·{" "}
+          {daysRemaining}d
         </span>
       ) : null}
     </Button>
@@ -430,7 +424,9 @@ export function PremiumMembershipButton({
       size={size}
       variant="outline"
       className={`border-amber-500/50 bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 dark:text-amber-400 ${
-        fullWidth ? "w-full" : ""
+        fullWidth
+          ? "w-full"
+          : ""
       } ${className}`}
     >
       <a
@@ -453,9 +449,6 @@ export function PremiumMembershipButton({
   );
 }
 
-/**
- * Side-by-side CTA row.
- */
 export function JobCtaRow({
   jobId,
   externalJobId,
