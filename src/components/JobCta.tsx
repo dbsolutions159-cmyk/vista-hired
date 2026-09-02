@@ -131,20 +131,32 @@ export function ApplyNowButton({
     );
   };
 
+  // While the server verdict is in flight for a signed-in user, show a neutral
+  // pending state instead of falsely claiming the trial has ended.
+  if (loading) {
+    return (
+      <Button size={size} disabled className={`gradient-primary text-primary-foreground shadow-soft ${width} ${className}`}>
+        <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+        Apply Now
+      </Button>
+    );
+  }
+
   // Visitor, non-member and expired trial all keep the URL hidden.
   if (!canApply) {
     return (
       <Button
         size={size}
         onClick={goPremium}
-        title="Free trial ended · Membership required to apply"
+        title="Membership required to apply"
         className={`gradient-primary text-primary-foreground shadow-soft ${width} ${className}`}
       >
-        {loading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Lock className="mr-1.5 h-4 w-4" />}
+        <Lock className="mr-1.5 h-4 w-4" />
         Unlock Apply
       </Button>
     );
   }
+
 
 
   const unlockAndApply = async () => {
@@ -163,7 +175,7 @@ export function ApplyNowButton({
         tab?.close();
         if (res.reason === "membership_required") {
           void refresh();
-          toast.error("Your free trial has ended \u2014 membership required to apply");
+          toast.error("Your free trial has ended — membership required to apply");
           goPremium();
         } else if (res.reason === "closed") toast.error("Applications for this job are closed");
         else toast.error("This job is no longer available");
@@ -187,7 +199,7 @@ export function ApplyNowButton({
       Apply Now
       {trialActive ? (
         <span className="ml-1.5 hidden rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-semibold sm:inline">
-          Free trial \u00b7 {daysRemaining}d
+          Free trial · {daysRemaining}d
         </span>
       ) : null}
     </Button>

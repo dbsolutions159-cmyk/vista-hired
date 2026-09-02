@@ -84,8 +84,15 @@ export function useApplyAccess() {
       ? Math.max(0, Math.ceil((new Date(a.trial.trial_end_at).getTime() - new Date(a.now).getTime()) / 86_400_000))
       : 0;
 
+  const msLeft =
+    a?.trialActive && a.trial
+      ? Math.max(0, new Date(a.trial.trial_end_at).getTime() - new Date(a.now).getTime())
+      : 0;
+  const hoursRemaining = Math.max(0, Math.ceil(msLeft / 3_600_000));
+
   return {
     access: a,
+    hoursRemaining,
     canApply: !!a?.canApply,
     membershipActive: !!a?.membershipActive,
     trialActive: !!a?.trialActive,

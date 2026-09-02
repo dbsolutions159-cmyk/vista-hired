@@ -24,6 +24,7 @@ const FILTERS = [
   { key: "trial_expired", label: "Expired Trial" },
   { key: "membership_active", label: "Active Membership" },
   { key: "membership_expired", label: "Expired Membership" },
+  { key: "no_access", label: "No Access" },
 ] as const;
 
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleDateString("en-IN", { dateStyle: "medium" }) : "—");
@@ -70,14 +71,15 @@ function AccessOverview() {
               <th className="p-3">Membership</th>
               <th className="p-3">Plan</th>
               <th className="p-3">Expires</th>
+              <th className="p-3">Apply access</th>
             </tr>
           </thead>
           <tbody>
             {isLoading && (
-              <tr><td colSpan={7} className="p-6 text-center text-muted-foreground">Loading…</td></tr>
+              <tr><td colSpan={8} className="p-6 text-center text-muted-foreground">Loading…</td></tr>
             )}
             {!isLoading && data.length === 0 && (
-              <tr><td colSpan={7} className="p-6 text-center text-muted-foreground">No accounts match this filter.</td></tr>
+              <tr><td colSpan={8} className="p-6 text-center text-muted-foreground">No accounts match this filter.</td></tr>
             )}
             {data.map((r) => (
               <tr key={r.user_id} className="border-t">
@@ -99,6 +101,11 @@ function AccessOverview() {
                 </td>
                 <td className="p-3 text-muted-foreground">{r.membership_plan ?? "—"}</td>
                 <td className="p-3 text-muted-foreground">{fmt(r.membership_expires_at)}</td>
+                <td className="p-3">
+                  <Badge variant={r.can_apply ? "default" : "destructive"}>
+                    {r.can_apply ? "Allowed" : "Locked"}
+                  </Badge>
+                </td>
               </tr>
             ))}
           </tbody>

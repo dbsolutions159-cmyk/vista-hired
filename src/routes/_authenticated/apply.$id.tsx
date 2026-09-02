@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { submitApplication } from "@/lib/applications.functions";
 import { computeCompletion } from "@/lib/profile-completion";
+import { premiumUrlWithReturn } from "@/lib/membership";
 
 export const Route = createFileRoute("/_authenticated/apply/$id")({
   component: ApplyPage,
@@ -99,7 +100,10 @@ function ApplyPage() {
       setDone(true);
       toast.success("Applied in one click ⚡");
     } catch (e: any) {
-      toast.error(e.message || "Failed to apply");
+      if (String(e?.message).includes("membership_required")) {
+        toast.error("Your free trial has ended — membership required to apply");
+        window.open(premiumUrlWithReturn(window.location.href), "_blank", "noopener,noreferrer");
+      } else toast.error(e.message || "Failed to apply");
     } finally {
       setUploading(false);
     }
@@ -130,7 +134,10 @@ function ApplyPage() {
       setDone(true);
       toast.success("Application submitted successfully!");
     } catch (e: any) {
-      toast.error(e.message || "Failed to submit application");
+      if (String(e?.message).includes("membership_required")) {
+        toast.error("Your free trial has ended — membership required to apply");
+        window.open(premiumUrlWithReturn(window.location.href), "_blank", "noopener,noreferrer");
+      } else toast.error(e.message || "Failed to submit application");
     } finally {
       setUploading(false);
     }

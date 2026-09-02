@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { logAccess, readApplyAccess } from "@/lib/trial.functions";
 
 const ApplicationInput = z.object({
   job_id: z.string().uuid(),
@@ -20,6 +21,14 @@ export const submitApplication = createServerFn({ method: "POST" })
   .inputValidator((v) => ApplicationInput.parse(v))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+
+    // Same gate as every other Apply surface: paid membership OR active trial,
+    // verified against database time.
+    const access = await readApplyAccess(userId);
+    if (!access.canApply) {
+      await logAccess(userId, "apply_access_denied", { job_id: data.job_id, reason: "no_active_access" });
+      throw new Error("membership_required");
+    }
 
     const { data: job, error: jobErr } = await supabase.from("jobs").select("id, title, company_name").eq("id", data.job_id).maybeSingle();
     if (jobErr || !job) throw new Error("Job not found");
