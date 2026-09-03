@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.job_owner_update_allowed(uuid, public.job_status, boolean, boolean, boolean, public.poster_role, uuid, uuid, text) TO authenticated;

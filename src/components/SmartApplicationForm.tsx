@@ -21,6 +21,8 @@ import { submitApplication } from "@/lib/applications.functions";
 
 type Props = {
   jobId: string;
+  jobTitle?: string;
+  companyName?: string;
   onSuccess?: () => void;
 };
 
