@@ -140,7 +140,7 @@ export function JobCard({ job }: { job: Job }) {
           />
 
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-1.5">
           <PremiumMembershipButton jobId={job.id} source="job_card" label="Premium" />
           <ApplyNowButton jobId={job.id} source="job_card" />
         </div>
