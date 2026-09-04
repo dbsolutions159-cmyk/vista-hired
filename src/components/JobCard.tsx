@@ -116,8 +116,9 @@ export function JobCard({ job }: { job: Job }) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between border-t bg-muted/30 px-2 py-1.5">
-        <div className="flex items-center gap-0.5">
+      <div className="flex flex-wrap items-center justify-between gap-y-1 border-t bg-muted/30 px-2 py-1.5">
+        <div className="flex min-w-0 flex-wrap items-center gap-0.5">
+
           <Button variant="ghost" size="sm" onClick={toggleLike} className="gap-1.5">
             <Heart className={`h-4 w-4 transition-transform ${liked ? "fill-red-500 text-red-500 scale-110" : ""}`} />
             <span className="tabular-nums">{likes}</span>
