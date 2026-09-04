@@ -48,18 +48,19 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 glass">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="grid h-9 w-9 place-items-center rounded-xl gradient-primary shadow-soft">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-3 sm:px-4">
+        <Link to="/" className="flex min-w-0 items-center gap-2">
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl gradient-primary shadow-soft">
             <Briefcase className="h-5 w-5 text-primary-foreground" />
           </div>
-          <div className="leading-tight">
-            <div className="font-display text-lg font-bold tracking-tight">HireSetu</div>
-            <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Jobs feed</div>
+          <div className="min-w-0 leading-tight">
+            <div className="truncate font-display text-base font-bold tracking-tight sm:text-lg">HireSetu</div>
+            <div className="truncate text-[10px] uppercase tracking-widest text-muted-foreground">Jobs feed</div>
           </div>
         </Link>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-0.5 sm:gap-2">
+
           <Button asChild size="sm" variant="outline" className="hidden sm:inline-flex border-primary/40 text-primary hover:bg-primary/10">
             <Link to="/post-job"><PlusCircle className="mr-1.5 h-4 w-4" />Post a Job</Link>
           </Button>
