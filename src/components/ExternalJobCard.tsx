@@ -113,7 +113,7 @@ export function ExternalJobCard({ job }: { job: ExternalJob }) {
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-1.5 border-t bg-muted/30 px-3 py-2">
+      <div className="flex flex-wrap items-center justify-end gap-1.5 border-t bg-muted/30 px-3 py-2">
         <PremiumMembershipButton source="external_job_card" label="Premium" />
         <Button
           asChild
