@@ -172,8 +172,8 @@ export function ImportedJobCard({ job }: { job: ImportedJob }) {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-end gap-1.5 border-t bg-muted/30 px-3 py-2">
-        <ShareJobMenu job={shareInfo} />
+      <div className="flex flex-wrap items-center justify-between gap-1.5 border-t bg-muted/30 px-2 py-2 sm:px-3">
+        <ExternalJobSocial source={job.source} externalId={job.external_id} share={shareInfo} />
         <Button variant="ghost" size="sm" onClick={report} disabled={reported} aria-label="Report job">
 
           <Flag className="h-4 w-4" />
