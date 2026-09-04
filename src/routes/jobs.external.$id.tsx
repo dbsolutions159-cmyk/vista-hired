@@ -18,7 +18,7 @@ import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { ApplyNowButton, PremiumMembershipButton } from "@/components/JobCta";
-import { ShareJobMenu } from "@/components/ShareJobMenu";
+import { ExternalJobSocial } from "@/components/ExternalJobSocial";
 import { SHARE_BANNER_URL, SITE_URL, hiresetuExternalJobUrl } from "@/lib/share";
 import { EXTERNAL_JOB_COLUMNS } from "@/lib/jobs";
 
@@ -307,7 +307,7 @@ function ExternalJobDetail() {
                 <Bookmark className={`mr-1.5 h-4 w-4 ${saved ? "fill-primary text-primary" : ""}`} />
                 {saved ? "Saved" : "Save Job"}
               </Button>
-              <ShareJobMenu job={shareInfo} variant="outline" label="Share" />
+              <ExternalJobSocial source={job.source} externalId={job.external_id} share={shareInfo} />
               <Button variant="outline" size="sm" onClick={report} disabled={reported}>
                 <Flag className="mr-1.5 h-4 w-4" /> Report Job
               </Button>

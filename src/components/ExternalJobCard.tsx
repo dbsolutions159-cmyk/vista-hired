@@ -8,6 +8,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import type { ExternalJob } from "@/lib/external-jobs.functions";
 import { PremiumMembershipButton, trackCtaClick } from "@/components/JobCta";
+import { ExternalJobSocial } from "@/components/ExternalJobSocial";
+import { hiresetuExternalJobUrl } from "@/lib/share";
 
 
 const empLabels: Record<ExternalJob["employment_type"], string> = {
@@ -113,7 +115,19 @@ export function ExternalJobCard({ job }: { job: ExternalJob }) {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-end gap-1.5 border-t bg-muted/30 px-3 py-2">
+      <div className="flex flex-wrap items-center justify-between gap-1.5 border-t bg-muted/30 px-2 py-2 sm:px-3">
+        <ExternalJobSocial
+          source={job.source}
+          externalId={externalId}
+          share={{
+            title: job.title,
+            company: job.company,
+            location: job.location,
+            employmentType: empLabels[job.employment_type],
+            url: hiresetuExternalJobUrl(job.id),
+          }}
+        />
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-1.5">
         <PremiumMembershipButton source="external_job_card" label="Premium" />
         <Button
           asChild
@@ -125,6 +139,7 @@ export function ExternalJobCard({ job }: { job: ExternalJob }) {
             Apply Now <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
           </a>
         </Button>
+        </div>
       </div>
 
     </Card>

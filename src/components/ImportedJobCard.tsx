@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { ApplyNowButton, PremiumMembershipButton, trackCtaClick } from "@/components/JobCta";
-import { ShareJobMenu } from "@/components/ShareJobMenu";
+import { ExternalJobSocial } from "@/components/ExternalJobSocial";
 import { hiresetuExternalJobUrl } from "@/lib/share";
 
 
@@ -174,12 +174,13 @@ export function ImportedJobCard({ job }: { job: ImportedJob }) {
 
       <div className="flex flex-wrap items-center justify-between gap-1.5 border-t bg-muted/30 px-2 py-2 sm:px-3">
         <ExternalJobSocial source={job.source} externalId={job.external_id} share={shareInfo} />
-        <Button variant="ghost" size="sm" onClick={report} disabled={reported} aria-label="Report job">
-
-          <Flag className="h-4 w-4" />
-        </Button>
-        <PremiumMembershipButton source="imported_job_card" label="Premium" />
-        <ApplyNowButton externalJobId={job.id} source="imported_job_card" />
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-1.5">
+          <Button variant="ghost" size="sm" onClick={report} disabled={reported} aria-label="Report job">
+            <Flag className="h-4 w-4" />
+          </Button>
+          <PremiumMembershipButton source="imported_job_card" label="Premium" />
+          <ApplyNowButton externalJobId={job.id} source="imported_job_card" />
+        </div>
       </div>
     </Card>
   );
