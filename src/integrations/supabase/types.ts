@@ -351,6 +351,54 @@ export type Database = {
           },
         ]
       }
+      external_job_comments: {
+        Row: {
+          comment: string
+          created_at: string
+          external_job_id: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment: string
+          created_at?: string
+          external_job_id: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          external_job_id?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      external_job_likes: {
+        Row: {
+          created_at: string
+          external_job_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          external_job_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          external_job_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       external_jobs: {
         Row: {
           apply_url: string
@@ -1143,6 +1191,15 @@ export type Database = {
     Functions: {
       apply_access_state: { Args: { _user_id: string }; Returns: Json }
       expire_due_trials: { Args: never; Returns: undefined }
+      external_job_social_counts: {
+        Args: { _keys: string[] }
+        Returns: {
+          comment_count: number
+          external_job_id: string
+          like_count: number
+          liked_by_me: boolean
+        }[]
+      }
       has_active_membership: { Args: { _user_id: string }; Returns: boolean }
       has_active_trial: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
