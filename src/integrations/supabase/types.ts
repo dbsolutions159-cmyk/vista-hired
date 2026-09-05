@@ -1218,6 +1218,7 @@ export type Database = {
           _job_id: string
           _poster_role: Database["public"]["Enums"]["poster_role"]
           _poster_user_id: string
+          _published: boolean
           _rejection_reason: string
           _status: Database["public"]["Enums"]["job_status"]
           _urgent: boolean
