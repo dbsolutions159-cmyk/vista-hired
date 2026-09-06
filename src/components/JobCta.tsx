@@ -110,6 +110,8 @@ export function ApplyNowButton({
   className = "",
   source,
   fullWidth = false,
+  openEventKey,
+  emitOpenEvent = false,
 }: {
   jobId?: string | null;
   externalJobId?: string | null;
@@ -119,6 +121,10 @@ export function ApplyNowButton({
   className?: string;
   source?: string;
   fullWidth?: boolean;
+  /** Shared key so a secondary (e.g. sticky) button can open this form. */
+  openEventKey?: string;
+  /** When true, clicking asks the primary button to open the form instead of rendering one here. */
+  emitOpenEvent?: boolean;
 }) {
   const { user } = useAuth();
 
@@ -141,6 +147,35 @@ export function ApplyNowButton({
     setShowApplicationForm,
   ] = useState(false);
 
+  const formRef =
+    useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!openEventKey || emitOpenEvent) return;
+
+    const handler = () => {
+      setShowApplicationForm(true);
+
+      window.setTimeout(() => {
+        formRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }, 80);
+    };
+
+    window.addEventListener(
+      `hiresetu:open-apply:${openEventKey}`,
+      handler,
+    );
+
+    return () =>
+      window.removeEventListener(
+        `hiresetu:open-apply:${openEventKey}`,
+        handler,
+      );
+  }, [openEventKey, emitOpenEvent]);
+
   const resolve =
     useServerFn(resolveApplyUrl);
 
@@ -151,6 +186,7 @@ export function ApplyNowButton({
   const isExternalJob =
     Boolean(externalJobId) &&
     !Boolean(jobId);
+
 
   if (
     applied &&
