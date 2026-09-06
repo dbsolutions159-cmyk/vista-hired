@@ -380,8 +380,10 @@ export function ApplyNowButton({
   ) {
     return (
       <div
+        ref={formRef}
         className={`w-full ${width}`}
       >
+
         <SmartApplicationForm
           jobId={jobId}
           jobTitle={
