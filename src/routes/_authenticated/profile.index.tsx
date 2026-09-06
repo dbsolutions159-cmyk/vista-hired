@@ -171,18 +171,35 @@ function ProfilePage() {
               <Button asChild size="sm" className="mt-3 gradient-primary text-primary-foreground"><Link to="/">Browse jobs</Link></Button>
             </div>
           )}
-          {applications.data?.map((a: any) => (
-            <Card key={a.id} className="p-4 hover:shadow-soft transition-shadow">
-              <div className="flex items-center justify-between gap-4">
-                <div className="min-w-0">
-                  <Link to="/jobs/$id" params={{ id: a.job_id }} className="font-semibold hover:text-primary">{a.jobs?.title}</Link>
-                  <div className="text-sm text-muted-foreground truncate">{a.jobs?.company_name} · {a.jobs?.location}</div>
-                  <div className="text-xs text-muted-foreground mt-1">Applied {timeAgo(a.created_at)}</div>
+          {applications.data?.map((a: any) => {
+            const withdrawn = a.stage === "withdrawn";
+            const locked = ["hired", "rejected", "offer_accepted"].includes(a.stage);
+            return (
+              <Card key={a.id} className="p-4 hover:shadow-soft transition-shadow">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <Link to="/jobs/$id" params={{ id: a.job_id }} className="font-semibold hover:text-primary">{a.jobs?.title}</Link>
+                    <div className="text-sm text-muted-foreground truncate">{a.jobs?.company_name} · {a.jobs?.location}</div>
+                    <div className="text-xs text-muted-foreground mt-1">Applied {timeAgo(a.created_at)}</div>
+                  </div>
+                  <StageBadge stage={a.stage} className="shrink-0" />
                 </div>
-                <Badge variant="secondary" className="rounded-full capitalize shrink-0">{a.status}</Badge>
-              </div>
-            </Card>
-          ))}
+                {!withdrawn && !locked && (
+                  <div className="mt-3 flex justify-end">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={withdrawingId === a.id}
+                      onClick={() => void withdraw(a.id)}
+                    >
+                      {withdrawingId === a.id ? "Withdrawing…" : "Withdraw application"}
+                    </Button>
+                  </div>
+                )}
+              </Card>
+            );
+          })}
+
         </TabsContent>
 
         <TabsContent value="saved" className="mt-4 space-y-3">
