@@ -279,8 +279,18 @@ export function ApplyNowButton({
       source,
     });
 
+    if (emitOpenEvent && openEventKey) {
+      window.dispatchEvent(
+        new CustomEvent(
+          `hiresetu:open-apply:${openEventKey}`,
+        ),
+      );
+      return;
+    }
+
     setShowApplicationForm(true);
   };
+
 
   const openExternalApplication =
     async () => {
