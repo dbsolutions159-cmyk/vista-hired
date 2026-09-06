@@ -359,7 +359,21 @@ function JobDetail() {
                     {job.category}
                   </Badge>
                 )}
+
+                <Badge
+                  variant="outline"
+                  className="rounded-full border-primary/40 text-primary"
+                >
+                  Direct on HireSetu
+                </Badge>
+
+                {(job as any).verified && (
+                  <Badge className="rounded-full border-emerald-500/40 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/10 dark:text-emerald-400">
+                    ✓ Verified
+                  </Badge>
+                )}
               </div>
+
             </div>
           </div>
 
