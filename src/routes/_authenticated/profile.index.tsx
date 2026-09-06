@@ -15,6 +15,9 @@ import { CompletionRing } from "@/components/CompletionRing";
 import { computeCompletionDetail } from "@/lib/profile-completion";
 import { ShareSubscriptionButton, SubscriptionButton } from "@/components/SubscriptionButtons";
 import { TrialStatusCard } from "@/components/TrialStatusCard";
+import { StageBadge } from "@/components/StageBadge";
+import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/_authenticated/profile/")({
   component: ProfilePage,
