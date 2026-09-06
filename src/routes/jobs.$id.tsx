@@ -458,6 +458,7 @@ function JobDetail() {
                 }
                 size="lg"
                 source="job_detail"
+                openEventKey={job.id}
                 fullWidth
               />
 
@@ -486,9 +487,9 @@ function JobDetail() {
                   url: hiresetuJobUrl(
                     job.id,
                   ),
-                  verified:
-                    (job as any)
-                      .verified ?? true,
+                  verified: Boolean(
+                    (job as any).verified,
+                  ),
                 }}
               />
             </div>
@@ -496,7 +497,7 @@ function JobDetail() {
         </div>
       </Card>
 
-      {/* Mobile sticky CTA */}
+      {/* Mobile sticky CTA — opens the form in the card above, never inside the bar */}
       <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 sm:hidden">
         <div className="pointer-events-auto flex gap-2 border-t bg-background/95 p-2.5 pb-[calc(0.625rem+env(safe-area-inset-bottom))] backdrop-blur">
           <ApplyNowButton
@@ -507,6 +508,8 @@ function JobDetail() {
             }
             size="lg"
             source="job_detail_sticky"
+            openEventKey={job.id}
+            emitOpenEvent
             fullWidth
             className="min-w-0 flex-1"
           />
@@ -521,6 +524,7 @@ function JobDetail() {
           />
         </div>
       </div>
+
 
       <div className="h-24 sm:hidden" />
     </div>
