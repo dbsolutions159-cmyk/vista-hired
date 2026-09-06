@@ -26,6 +26,24 @@ export const Route = createFileRoute("/_authenticated/profile/")({
 function ProfilePage() {
   const { user } = useAuth();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [withdrawingId, setWithdrawingId] = useState<string | null>(null);
+
+  const withdraw = async (applicationId: string) => {
+    setWithdrawingId(applicationId);
+    const { error } = await supabase
+      .from("applications")
+      .update({ stage: "withdrawn", status: "withdrawn" })
+      .eq("id", applicationId)
+      .eq("user_id", user!.id);
+    setWithdrawingId(null);
+    if (error) {
+      toast.error("Couldn't withdraw this application");
+      return;
+    }
+    toast.success("Application withdrawn");
+    void applications.refetch();
+  };
+
 
   const profileQ = useQuery({
     enabled: !!user,
