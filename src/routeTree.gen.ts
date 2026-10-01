@@ -9,45 +9,36 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as PostJobRouteImport } from './routes/post-job'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedHiringRouteImport } from './routes/_authenticated/hiring'
-import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as PostJobRouteImport } from './routes/post-job'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as JobsIdRouteImport } from './routes/jobs.$id'
-import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
-import { Route as AuthenticatedAdminAccessRouteImport } from './routes/_authenticated/admin.access'
-import { Route as AuthenticatedAdminApplicationsRouteImport } from './routes/_authenticated/admin.applications'
-import { Route as AuthenticatedAdminImportsRouteImport } from './routes/_authenticated/admin.imports'
-import { Route as AuthenticatedAdminJobsRouteImport } from './routes/_authenticated/admin.jobs'
-import { Route as AuthenticatedAdminSubmissionsRouteImport } from './routes/_authenticated/admin.submissions'
-import { Route as AuthenticatedApplyIdRouteImport } from './routes/_authenticated/apply.$id'
-import { Route as AuthenticatedHiringIndexRouteImport } from './routes/_authenticated/hiring.index'
-import { Route as AuthenticatedHiringApplicantsRouteImport } from './routes/_authenticated/hiring.applicants'
-import { Route as AuthenticatedHiringInterviewsRouteImport } from './routes/_authenticated/hiring.interviews'
-import { Route as AuthenticatedHiringJobsRouteImport } from './routes/_authenticated/hiring.jobs'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedHiringRouteImport } from './routes/_authenticated/hiring'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedProfileIndexRouteImport } from './routes/_authenticated/profile.index'
-import { Route as AuthenticatedProfileEditRouteImport } from './routes/_authenticated/profile.edit'
+import { Route as AuthenticatedHiringIndexRouteImport } from './routes/_authenticated/hiring.index'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as JobsExternalIdRouteImport } from './routes/jobs.external.$id'
-import { Route as AuthenticatedAdminApplicationsIdRouteImport } from './routes/_authenticated/admin.applications.$id'
-import { Route as AuthenticatedHiringCandidatesAppIdRouteImport } from './routes/_authenticated/hiring.candidates.$appId'
+import { Route as AuthenticatedProfileEditRouteImport } from './routes/_authenticated/profile.edit'
+import { Route as AuthenticatedHiringJobsRouteImport } from './routes/_authenticated/hiring.jobs'
+import { Route as AuthenticatedHiringInterviewsRouteImport } from './routes/_authenticated/hiring.interviews'
+import { Route as AuthenticatedHiringApplicantsRouteImport } from './routes/_authenticated/hiring.applicants'
+import { Route as AuthenticatedApplyIdRouteImport } from './routes/_authenticated/apply.$id'
+import { Route as AuthenticatedAdminSubmissionsRouteImport } from './routes/_authenticated/admin.submissions'
+import { Route as AuthenticatedAdminJobsRouteImport } from './routes/_authenticated/admin.jobs'
+import { Route as AuthenticatedAdminImportsRouteImport } from './routes/_authenticated/admin.imports'
+import { Route as AuthenticatedAdminApplicationsRouteImport } from './routes/_authenticated/admin.applications'
+import { Route as AuthenticatedAdminAccessRouteImport } from './routes/_authenticated/admin.access'
 import { Route as ApiPublicHooksSyncJobsRouteImport } from './routes/api/public/hooks/sync-jobs'
+import { Route as AuthenticatedHiringCandidatesAppIdRouteImport } from './routes/_authenticated/hiring.candidates.$appId'
+import { Route as AuthenticatedAdminApplicationsIdRouteImport } from './routes/_authenticated/admin.applications.$id'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PostJobRoute = PostJobRouteImport.update({
@@ -55,14 +46,28 @@ const PostJobRoute = PostJobRouteImport.update({
   path: '/post-job',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsIdRoute = JobsIdRouteImport.update({
+  id: '/jobs/$id',
+  path: '/jobs/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHiringRoute = AuthenticatedHiringRouteImport.update({
@@ -70,59 +75,48 @@ const AuthenticatedHiringRoute = AuthenticatedHiringRouteImport.update({
   path: '/hiring',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const JobsIdRoute = JobsIdRouteImport.update({
-  id: '/jobs/$id',
-  path: '/jobs/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const AuthenticatedProfileIndexRoute =
+  AuthenticatedProfileIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedProfileRoute,
+  } as any)
+const AuthenticatedHiringIndexRoute =
+  AuthenticatedHiringIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedHiringRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const AuthenticatedAdminAccessRoute =
-  AuthenticatedAdminAccessRouteImport.update({
-    id: '/access',
-    path: '/access',
-    getParentRoute: () => AuthenticatedAdminRoute,
+const JobsExternalIdRoute = JobsExternalIdRouteImport.update({
+  id: '/jobs/external/$id',
+  path: '/jobs/external/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedProfileEditRoute =
+  AuthenticatedProfileEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AuthenticatedProfileRoute,
   } as any)
-const AuthenticatedAdminApplicationsRoute =
-  AuthenticatedAdminApplicationsRouteImport.update({
-    id: '/applications',
-    path: '/applications',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminImportsRoute =
-  AuthenticatedAdminImportsRouteImport.update({
-    id: '/imports',
-    path: '/imports',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminJobsRoute = AuthenticatedAdminJobsRouteImport.update({
+const AuthenticatedHiringJobsRoute = AuthenticatedHiringJobsRouteImport.update({
   id: '/jobs',
   path: '/jobs',
-  getParentRoute: () => AuthenticatedAdminRoute,
+  getParentRoute: () => AuthenticatedHiringRoute,
 } as any)
-const AuthenticatedAdminSubmissionsRoute =
-  AuthenticatedAdminSubmissionsRouteImport.update({
-    id: '/submissions',
-    path: '/submissions',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedApplyIdRoute = AuthenticatedApplyIdRouteImport.update({
-  id: '/apply/$id',
-  path: '/apply/$id',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedHiringIndexRoute =
-  AuthenticatedHiringIndexRouteImport.update({
-    id: '/',
-    path: '/',
+const AuthenticatedHiringInterviewsRoute =
+  AuthenticatedHiringInterviewsRouteImport.update({
+    id: '/interviews',
+    path: '/interviews',
     getParentRoute: () => AuthenticatedHiringRoute,
   } as any)
 const AuthenticatedHiringApplicantsRoute =
@@ -131,51 +125,57 @@ const AuthenticatedHiringApplicantsRoute =
     path: '/applicants',
     getParentRoute: () => AuthenticatedHiringRoute,
   } as any)
-const AuthenticatedHiringInterviewsRoute =
-  AuthenticatedHiringInterviewsRouteImport.update({
-    id: '/interviews',
-    path: '/interviews',
-    getParentRoute: () => AuthenticatedHiringRoute,
+const AuthenticatedApplyIdRoute = AuthenticatedApplyIdRouteImport.update({
+  id: '/apply/$id',
+  path: '/apply/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminSubmissionsRoute =
+  AuthenticatedAdminSubmissionsRouteImport.update({
+    id: '/submissions',
+    path: '/submissions',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedHiringJobsRoute = AuthenticatedHiringJobsRouteImport.update({
+const AuthenticatedAdminJobsRoute = AuthenticatedAdminJobsRouteImport.update({
   id: '/jobs',
   path: '/jobs',
-  getParentRoute: () => AuthenticatedHiringRoute,
+  getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const AuthenticatedProfileIndexRoute =
-  AuthenticatedProfileIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedProfileRoute,
+const AuthenticatedAdminImportsRoute =
+  AuthenticatedAdminImportsRouteImport.update({
+    id: '/imports',
+    path: '/imports',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedProfileEditRoute =
-  AuthenticatedProfileEditRouteImport.update({
-    id: '/edit',
-    path: '/edit',
-    getParentRoute: () => AuthenticatedProfileRoute,
+const AuthenticatedAdminApplicationsRoute =
+  AuthenticatedAdminApplicationsRouteImport.update({
+    id: '/applications',
+    path: '/applications',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const JobsExternalIdRoute = JobsExternalIdRouteImport.update({
-  id: '/jobs/external/$id',
-  path: '/jobs/external/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedAdminApplicationsIdRoute =
-  AuthenticatedAdminApplicationsIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedAdminApplicationsRoute,
-  } as any)
-const AuthenticatedHiringCandidatesAppIdRoute =
-  AuthenticatedHiringCandidatesAppIdRouteImport.update({
-    id: '/candidates/$appId',
-    path: '/candidates/$appId',
-    getParentRoute: () => AuthenticatedHiringRoute,
+const AuthenticatedAdminAccessRoute =
+  AuthenticatedAdminAccessRouteImport.update({
+    id: '/access',
+    path: '/access',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const ApiPublicHooksSyncJobsRoute = ApiPublicHooksSyncJobsRouteImport.update({
   id: '/api/public/hooks/sync-jobs',
   path: '/api/public/hooks/sync-jobs',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedHiringCandidatesAppIdRoute =
+  AuthenticatedHiringCandidatesAppIdRouteImport.update({
+    id: '/candidates/$appId',
+    path: '/candidates/$appId',
+    getParentRoute: () => AuthenticatedHiringRoute,
+  } as any)
+const AuthenticatedAdminApplicationsIdRoute =
+  AuthenticatedAdminApplicationsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedAdminApplicationsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -352,25 +352,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/post-job': {
@@ -380,18 +366,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostJobRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs/$id': {
+      id: '/jobs/$id'
+      path: '/jobs/$id'
+      fullPath: '/jobs/$id'
+      preLoaderRoute: typeof JobsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/hiring': {
@@ -401,68 +408,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHiringRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/profile': {
-      id: '/_authenticated/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/jobs/$id': {
-      id: '/jobs/$id'
-      path: '/jobs/$id'
-      fullPath: '/jobs/$id'
-      preLoaderRoute: typeof JobsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/admin/': {
-      id: '/_authenticated/admin/'
+    '/_authenticated/profile/': {
+      id: '/_authenticated/profile/'
       path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/access': {
-      id: '/_authenticated/admin/access'
-      path: '/access'
-      fullPath: '/admin/access'
-      preLoaderRoute: typeof AuthenticatedAdminAccessRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/applications': {
-      id: '/_authenticated/admin/applications'
-      path: '/applications'
-      fullPath: '/admin/applications'
-      preLoaderRoute: typeof AuthenticatedAdminApplicationsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/imports': {
-      id: '/_authenticated/admin/imports'
-      path: '/imports'
-      fullPath: '/admin/imports'
-      preLoaderRoute: typeof AuthenticatedAdminImportsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/jobs': {
-      id: '/_authenticated/admin/jobs'
-      path: '/jobs'
-      fullPath: '/admin/jobs'
-      preLoaderRoute: typeof AuthenticatedAdminJobsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/submissions': {
-      id: '/_authenticated/admin/submissions'
-      path: '/submissions'
-      fullPath: '/admin/submissions'
-      preLoaderRoute: typeof AuthenticatedAdminSubmissionsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/apply/$id': {
-      id: '/_authenticated/apply/$id'
-      path: '/apply/$id'
-      fullPath: '/apply/$id'
-      preLoaderRoute: typeof AuthenticatedApplyIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      fullPath: '/profile/'
+      preLoaderRoute: typeof AuthenticatedProfileIndexRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
     }
     '/_authenticated/hiring/': {
       id: '/_authenticated/hiring/'
@@ -471,11 +429,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHiringIndexRouteImport
       parentRoute: typeof AuthenticatedHiringRoute
     }
-    '/_authenticated/hiring/applicants': {
-      id: '/_authenticated/hiring/applicants'
-      path: '/applicants'
-      fullPath: '/hiring/applicants'
-      preLoaderRoute: typeof AuthenticatedHiringApplicantsRouteImport
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/jobs/external/$id': {
+      id: '/jobs/external/$id'
+      path: '/jobs/external/$id'
+      fullPath: '/jobs/external/$id'
+      preLoaderRoute: typeof JobsExternalIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/profile/edit': {
+      id: '/_authenticated/profile/edit'
+      path: '/edit'
+      fullPath: '/profile/edit'
+      preLoaderRoute: typeof AuthenticatedProfileEditRouteImport
+      parentRoute: typeof AuthenticatedProfileRoute
+    }
+    '/_authenticated/hiring/jobs': {
+      id: '/_authenticated/hiring/jobs'
+      path: '/jobs'
+      fullPath: '/hiring/jobs'
+      preLoaderRoute: typeof AuthenticatedHiringJobsRouteImport
       parentRoute: typeof AuthenticatedHiringRoute
     }
     '/_authenticated/hiring/interviews': {
@@ -485,40 +464,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHiringInterviewsRouteImport
       parentRoute: typeof AuthenticatedHiringRoute
     }
-    '/_authenticated/hiring/jobs': {
-      id: '/_authenticated/hiring/jobs'
-      path: '/jobs'
-      fullPath: '/hiring/jobs'
-      preLoaderRoute: typeof AuthenticatedHiringJobsRouteImport
+    '/_authenticated/hiring/applicants': {
+      id: '/_authenticated/hiring/applicants'
+      path: '/applicants'
+      fullPath: '/hiring/applicants'
+      preLoaderRoute: typeof AuthenticatedHiringApplicantsRouteImport
       parentRoute: typeof AuthenticatedHiringRoute
     }
-    '/_authenticated/profile/': {
-      id: '/_authenticated/profile/'
-      path: '/'
-      fullPath: '/profile/'
-      preLoaderRoute: typeof AuthenticatedProfileIndexRouteImport
-      parentRoute: typeof AuthenticatedProfileRoute
+    '/_authenticated/apply/$id': {
+      id: '/_authenticated/apply/$id'
+      path: '/apply/$id'
+      fullPath: '/apply/$id'
+      preLoaderRoute: typeof AuthenticatedApplyIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/profile/edit': {
-      id: '/_authenticated/profile/edit'
-      path: '/edit'
-      fullPath: '/profile/edit'
-      preLoaderRoute: typeof AuthenticatedProfileEditRouteImport
-      parentRoute: typeof AuthenticatedProfileRoute
+    '/_authenticated/admin/submissions': {
+      id: '/_authenticated/admin/submissions'
+      path: '/submissions'
+      fullPath: '/admin/submissions'
+      preLoaderRoute: typeof AuthenticatedAdminSubmissionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/jobs/external/$id': {
-      id: '/jobs/external/$id'
-      path: '/jobs/external/$id'
-      fullPath: '/jobs/external/$id'
-      preLoaderRoute: typeof JobsExternalIdRouteImport
+    '/_authenticated/admin/jobs': {
+      id: '/_authenticated/admin/jobs'
+      path: '/jobs'
+      fullPath: '/admin/jobs'
+      preLoaderRoute: typeof AuthenticatedAdminJobsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/imports': {
+      id: '/_authenticated/admin/imports'
+      path: '/imports'
+      fullPath: '/admin/imports'
+      preLoaderRoute: typeof AuthenticatedAdminImportsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/applications': {
+      id: '/_authenticated/admin/applications'
+      path: '/applications'
+      fullPath: '/admin/applications'
+      preLoaderRoute: typeof AuthenticatedAdminApplicationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/access': {
+      id: '/_authenticated/admin/access'
+      path: '/access'
+      fullPath: '/admin/access'
+      preLoaderRoute: typeof AuthenticatedAdminAccessRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/api/public/hooks/sync-jobs': {
+      id: '/api/public/hooks/sync-jobs'
+      path: '/api/public/hooks/sync-jobs'
+      fullPath: '/api/public/hooks/sync-jobs'
+      preLoaderRoute: typeof ApiPublicHooksSyncJobsRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/admin/applications/$id': {
-      id: '/_authenticated/admin/applications/$id'
-      path: '/$id'
-      fullPath: '/admin/applications/$id'
-      preLoaderRoute: typeof AuthenticatedAdminApplicationsIdRouteImport
-      parentRoute: typeof AuthenticatedAdminApplicationsRoute
     }
     '/_authenticated/hiring/candidates/$appId': {
       id: '/_authenticated/hiring/candidates/$appId'
@@ -527,12 +527,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHiringCandidatesAppIdRouteImport
       parentRoute: typeof AuthenticatedHiringRoute
     }
-    '/api/public/hooks/sync-jobs': {
-      id: '/api/public/hooks/sync-jobs'
-      path: '/api/public/hooks/sync-jobs'
-      fullPath: '/api/public/hooks/sync-jobs'
-      preLoaderRoute: typeof ApiPublicHooksSyncJobsRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/admin/applications/$id': {
+      id: '/_authenticated/admin/applications/$id'
+      path: '/$id'
+      fullPath: '/admin/applications/$id'
+      preLoaderRoute: typeof AuthenticatedAdminApplicationsIdRouteImport
+      parentRoute: typeof AuthenticatedAdminApplicationsRoute
     }
   }
 }
