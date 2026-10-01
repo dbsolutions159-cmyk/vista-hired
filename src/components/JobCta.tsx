@@ -303,10 +303,12 @@ export function ApplyNowButton({
 
       setUnlocking(true);
 
+      // Open a real tab up front (inside the user gesture) so the popup is
+      // never blocked, then navigate it to the official URL once resolved —
+      // one tab, no blank leftover.
       const tab = window.open(
-        "",
+        "about:blank",
         "_blank",
-        "noopener,noreferrer",
       );
 
       try {
@@ -325,6 +327,7 @@ export function ApplyNowButton({
 
         if (res.ok) {
           if (tab) {
+            tab.opener = null;
             tab.location.href =
               res.url;
           } else {
