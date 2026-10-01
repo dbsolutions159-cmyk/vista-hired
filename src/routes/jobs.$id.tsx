@@ -248,9 +248,9 @@ export const Route = createFileRoute("/jobs/$id")({
     </div>
   ),
 
-  errorComponent: ({ error }) => (
+  errorComponent: ({ error }: { error: unknown }) => (
     <div className="mx-auto max-w-3xl p-10 text-center text-muted-foreground">
-      Couldn't load this job. {error.message}
+      Couldn't load this job. {error instanceof Error ? error.message : String(error)}
     </div>
   ),
 });
