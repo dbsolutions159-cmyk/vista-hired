@@ -7,6 +7,7 @@ import {
   CalendarDays,
   CheckCircle2,
   Flag,
+  Globe,
   MapPin,
   Wifi,
 } from "lucide-react";
@@ -307,13 +308,21 @@ function ExternalJobDetail() {
                 <Bookmark className={`mr-1.5 h-4 w-4 ${saved ? "fill-primary text-primary" : ""}`} />
                 {saved ? "Saved" : "Save Job"}
               </Button>
+              {job.company_career_url && (
+                <Button asChild variant="outline" size="sm">
+                  <a href={job.company_career_url} target="_blank" rel="noopener noreferrer">
+                    <Globe className="mr-1.5 h-4 w-4" /> Visit Job
+                  </a>
+                </Button>
+              )}
               <ExternalJobSocial source={job.source} externalId={job.external_id} share={shareInfo} />
               <Button variant="outline" size="sm" onClick={report} disabled={reported}>
                 <Flag className="mr-1.5 h-4 w-4" /> Report Job
               </Button>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              Apply Now opens the official company application page. HireSetu never redirects you to other job aggregators.
+              Apply Now opens the official company application page in a new tab. Visit Job opens the
+              source careers page directly. HireSetu never redirects you to other job aggregators.
             </p>
           </div>
         </div>

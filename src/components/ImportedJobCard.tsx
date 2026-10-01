@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Bookmark, Briefcase, Building2, CheckCircle2, ExternalLink, Flag, MapPin, Wifi } from "lucide-react";
+import { Bookmark, Briefcase, Building2, CheckCircle2, ExternalLink, Flag, Globe, MapPin, Wifi } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -178,6 +178,13 @@ export function ImportedJobCard({ job }: { job: ImportedJob }) {
           <Button variant="ghost" size="sm" onClick={report} disabled={reported} aria-label="Report job">
             <Flag className="h-4 w-4" />
           </Button>
+          {job.company_career_url && (
+            <Button asChild variant="outline" size="sm">
+              <a href={job.company_career_url} target="_blank" rel="noopener noreferrer">
+                <Globe className="mr-1.5 h-4 w-4" /> Visit Job
+              </a>
+            </Button>
+          )}
           <PremiumMembershipButton source="imported_job_card" label="Premium" />
           <ApplyNowButton externalJobId={job.id} source="imported_job_card" />
         </div>
